@@ -1,3 +1,15 @@
+# Other links
+
+https://github.com/karelzak/util-linux/blob/master/sys-utils/flock.c
+http://www.tutorialspoint.com/unix_system_calls/fcntl.htm
+http://www.informit.com/articles/article.aspx?p=23618&seqNum=4
+http://www.grpc.io/docs/tutorials/basic/go.html#bidirectional-streaming-rpc-1
+https://github.com/lomik/elock
+https://github.com/komarov/switchman
+https://redis.io/topics/distlock
+https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html
+https://lwn.net/Articles/91268/
+
 ## FILE LOCKING DEMO
 
 (from http://voyager.deanza.edu/~perry/lock.html)
