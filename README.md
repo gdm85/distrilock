@@ -1,5 +1,7 @@
 ## FILE LOCKING DEMO
 
+(from http://voyager.deanza.edu/~perry/lock.html)
+
 ### Write Lock Setter
 ```c
 #include <sys/types.h>
