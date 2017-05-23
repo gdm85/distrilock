@@ -3,8 +3,6 @@ package main
 import (
     "fmt"
     "net"
-    "io"
-    "time"
     "os"
 )
 
@@ -14,6 +12,17 @@ const (
 )
 
 func main() {
+	what := os.Args[1]
+	if what == "server" {
+		server()
+	} else if what == "client" {
+		client()
+	} else {
+		panic("invalid choice")
+	}
+}
+
+func server() {
 	a, err := net.ResolveTCPAddr("tcp", CONN_HOST+":"+CONN_PORT)
     if err != nil {
         fmt.Println("Error resolving:", err.Error())
@@ -39,38 +48,4 @@ func main() {
         // Handle connections in a new goroutine.
         go handleRequest(conn)
     }
-}
-
-// Handles incoming requests.
-func handleRequest(conn *net.TCPConn) {
-	// setup keep-alive
-	err := conn.SetKeepAlive(true)
-	if err != nil {
-		panic(err.Error())
-	}
-	err = conn.SetKeepAlivePeriod(time.Second*3)
-	if err != nil {
-		panic(err.Error())
-	}
-	fmt.Println("a client connected")
-  // Make a buffer to hold incoming data.
-  buf := make([]byte, 1024)
-  for {
-	// Read the incoming connection into the buffer.
-	  reqLen, err := conn.Read(buf)
-	  if err != nil {
-		if err == io.EOF {
-			// other end interrupted connection
-			break
-		}
-		fmt.Println("Error reading:", err.Error())
-		continue
-	  }
-	  fmt.Println("received:", string(buf[:reqLen]))
-	  // Send a response back to person contacting us.
-	  conn.Write([]byte("Message received."))
-	}
-  // Close the connection when you're done with it.
-  conn.Close()
-  fmt.Println("a client disconnected")
 }

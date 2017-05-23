@@ -1,3 +1,6 @@
+# distrilock
+Distributed locking for pennies.
+
 # Other links
 
 https://github.com/karelzak/util-linux/blob/master/sys-utils/flock.c
