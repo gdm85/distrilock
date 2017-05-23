@@ -64,5 +64,5 @@ func client() {
 		fmt.Println("Error reading:", err.Error())
 		return
 	  }
-	  fmt.Println("received:", req)
+	  fmt.Println("received response:", res)
 }

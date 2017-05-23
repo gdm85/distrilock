@@ -10,6 +10,7 @@ import (
 )
 
 type LockCommand uint8
+type LockCommandResult uint8
 
 const (
 	VersionMajor = 0
@@ -18,6 +19,13 @@ const (
 	Peek LockCommand = iota
 	Acquire
 	Release	
+	
+	Failed LockCommandResult = iota
+	Success
+	BadRequest
+	InternalError
+	Denied
+	TooBusy
 )
 
 
@@ -30,7 +38,8 @@ type LockRequest struct {
 
 type LockResponse struct {
 	LockRequest
-	Success bool
+	Result LockCommandResult
+	Reason string
 	//TODO: add peeked info
 }
 
@@ -60,10 +69,10 @@ func handleRequest(conn *net.TCPConn) {
 		fmt.Println("Error reading:", err.Error())
 		continue
 	  }
-	  fmt.Println("received:", req)
+	  fmt.Println("received request:", req)
 	  
 	  if req.VersionMajor > VersionMajor {
-		  fmt.Println("skipping package from superior major version")
+		  fmt.Println("skipping request with superior major version")
 		  continue
 	  }
 	  
@@ -71,7 +80,8 @@ func handleRequest(conn *net.TCPConn) {
 	  res.LockRequest = req
 	  res.VersionMajor, res.VersionMinor = VersionMajor, VersionMinor
 	  //TODO: finish this
-	  res.Success = false
+	  res.Result = Denied
+	  res.Reason = "not yet implemented"
 	  
 	  // Send a response back to person contacting us.
 	  err = e.Encode(&res)
