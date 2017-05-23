@@ -1,6 +1,18 @@
 # distrilock
 Distributed locking for pennies.
 
+## levels of locking
+
+1. the running instance tracks open files (one per lock) per connection
+2. fcntl (collaborative) lock is acquired on the open file
+3. fcntl (collaborative) lock is released on the open file, which is closed and forgotten
+
+In case of errors at (2), file from (1) is closed.
+Q: is state inconsistent in case of failures at (3)?
+
+Tests must be added for all supported service scenarios.
+A good test would be to peek locks being held consistently with internal maps states.
+
 # Other links
 
 https://github.com/karelzak/util-linux/blob/master/sys-utils/flock.c

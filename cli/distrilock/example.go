@@ -4,9 +4,9 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
-	"bufio"
 	"syscall"
 	"time"
 )
@@ -14,7 +14,7 @@ import (
 func exampleMain() {
 	var err error
 	var f *os.File
-	
+
 	what := os.Args[1]
 	if what == "write" {
 		err = writeLockSet("book.dat")
@@ -29,16 +29,15 @@ func exampleMain() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	
+
 	if what == "acquire" {
 		fmt.Println("waiting 3 seconds before release")
 		time.Sleep(3 * time.Second)
 		err = releaseLock(f)
 	}
-	
-	
+
 	fmt.Println("Press Enter to continue...")
-	bufio.NewReader(os.Stdin).ReadBytes('\n') 
+	bufio.NewReader(os.Stdin).ReadBytes('\n')
 }
 
 func acquireLock(fname string) (*os.File, error) {
@@ -46,14 +45,31 @@ func acquireLock(fname string) (*os.File, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	return fi, acquireLockDirect(fi)
+}
+
+func acquireLockDirect(fi *os.File) error {
 	fd := fi.Fd()
 
 	var lt syscall.Flock_t
 	lt.Type = syscall.F_WRLCK
 	lt.Whence = int16(os.SEEK_SET)
-	saveLock := lt // make a copy
 
-	return fi, syscall.FcntlFlock(fd, syscall.F_SETLK, &saveLock)
+	return syscall.FcntlFlock(fd, syscall.F_SETLK, &lt)
+}
+
+func peekLock(fi *os.File) (bool, error) {
+	fd := fi.Fd()
+	var lt syscall.Flock_t
+	lt.Type = syscall.F_WRLCK
+	lt.Whence = int16(os.SEEK_SET)
+
+	err := syscall.FcntlFlock(fd, syscall.F_GETLK, &lt)
+	if err != nil {
+		return false, err
+	}
+	return lt.Type == syscall.F_WRLCK, nil
 }
 
 func releaseLock(f *os.File) error {
