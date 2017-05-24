@@ -8,17 +8,25 @@ import (
 	"sync"
 )
 
+// LockCommand is a lock command identifier.
 type LockCommand uint8
+
+// LockCommandResult is the result of a lock command.
 type LockCommandResult uint8
 
 const (
+	// VersionMajor is the major version of the distrilock protocol
 	VersionMajor = 0
+	// VersionMinor is the minor version of the distrilock protocol
 	VersionMinor = 1
 )
 
 const (
+	// Peek is the command used to verify current status of a named lock.
 	Peek LockCommand = iota
+	// Acquire is the command used to request acquisition of a named lock.
 	Acquire
+	// Release is the command used to request release of a named lock.
 	Release
 )
 
@@ -181,7 +189,9 @@ func acquire(client *net.TCPConn, lockName string) (LockCommandResult, string) {
 	}
 
 	// already acquired by self
-	//TODO: this is a no-operation, should acquire again with fcntl?
+	//TODO: this is a no-operation, should lock be acquired again with fcntl?
+	//		and what if the re-acquisition fails? that would perhaps qualify
+	//		as a different lock command?
 	return Success, "no-op"
 }
 
