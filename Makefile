@@ -5,8 +5,8 @@ PKG := bitbucket.org/gdm85/go-distrilock
 
 all: vendor build test
 
-#vendor:
-#	if ! ls vendor/github.com/gorilla/websocket/* 2>/dev/null >/dev/null; then git submodule update --init --recursive; fi
+vendor:
+	if ! ls vendor/github.com/ogier/pflag/* 2>/dev/null >/dev/null; then git submodule update --init --recursive; fi
 
 build:
 	mkdir -p bin
