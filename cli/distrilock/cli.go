@@ -9,13 +9,14 @@ import (
 	flag "github.com/ogier/pflag"
 )
 
+const defaultAddress = ":13123"
+
 type flags struct {
 	*flag.FlagSet
-	
-	Address     string
-	Client bool
-	Name string
-		
+
+	Address string
+	Name    string
+
 	// some parsed options
 	a *net.TCPAddr
 }
@@ -28,11 +29,9 @@ func mustParseFlags(args []string) (*flags, error) {
 	var f flags
 	f.FlagSet = flag.NewFlagSet(args[0], flag.ExitOnError)
 
-	f.FlagSet.StringVarP(&f.Address, "address", "a", ":13123", "address to listen on")
-	f.FlagSet.BoolVarP(&f.Client, "client", "c", false, "perform a client connection test")
-	f.FlagSet.StringVarP(&f.Name, "name", "n", "", "lock name to acquire during client connection test")
+	f.FlagSet.StringVarP(&f.Address, "address", "a", defaultAddress, "address to listen on")
 	f.FlagSet.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: distrilock [--address :13123] [--client] [--name lock-name]\n\n")
+		fmt.Fprintf(os.Stderr, "Usage: distrilock [--address %s]\n\n", defaultAddress)
 		flag.PrintDefaults()
 	}
 
@@ -49,14 +48,6 @@ func mustParseFlags(args []string) (*flags, error) {
 	f.a, err = net.ResolveTCPAddr("tcp", f.Address)
 	if err != nil {
 		return nil, err
-	}
-	
-	if f.Name != "" && !f.Client {
-		return nil, errors.New("lock name cannot be specified in server mode")
-	}
-	
-	if f.Client && f.Name == "" {
-		return nil, errors.New("lock name must be specified in client mode")
 	}
 
 	return &f, nil

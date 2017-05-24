@@ -6,6 +6,8 @@ import (
 	"io"
 	"net"
 	"time"
+
+	"bitbucket.org/gdm85/go-distrilock/api"
 )
 
 // Handles incoming requests.
@@ -24,7 +26,7 @@ func handleRequest(conn *net.TCPConn) {
 	d := gob.NewDecoder(conn)
 	e := gob.NewEncoder(conn)
 	for {
-		var req LockRequest
+		var req api.LockRequest
 		err = d.Decode(&req)
 		if err != nil {
 			if err == io.EOF {
@@ -36,7 +38,7 @@ func handleRequest(conn *net.TCPConn) {
 		}
 		fmt.Println("received request:", req)
 
-		if req.VersionMajor > VersionMajor {
+		if req.VersionMajor > api.VersionMajor {
 			fmt.Println("skipping request with superior major version")
 			continue
 		}

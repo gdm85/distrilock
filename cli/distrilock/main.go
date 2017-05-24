@@ -12,24 +12,16 @@ func main() {
 		fmt.Fprintf(os.Stderr, "ERROR: %v\n", err)
 		os.Exit(5)
 	}
-	
-	if flags.Client {
-		client(flags.a, flags.Name)
-	} else {
-		server(flags.a)
-	}
-}
 
-func server(a *net.TCPAddr) {
 	// Listen for incoming connections.
-	l, err := net.ListenTCP("tcp", a)
+	l, err := net.ListenTCP("tcp", flags.a)
 	if err != nil {
 		fmt.Println("Error listening:", err.Error())
 		os.Exit(1)
 	}
 	// Close the listener when the application closes.
 	defer l.Close()
-	fmt.Println("Listening on", a)
+	fmt.Println("Listening on", flags.a)
 	for {
 		// Listen for an incoming connection.
 		conn, err := l.AcceptTCP()
