@@ -9,13 +9,7 @@ import (
 	"time"
 )
 
-func client() {
-	a, err := net.ResolveTCPAddr("tcp", CONN_HOST+":"+CONN_PORT)
-	if err != nil {
-		fmt.Println("Error resolving:", err.Error())
-		os.Exit(1)
-	}
-
+func client(a *net.TCPAddr) {
 	conn, err := net.DialTCP("tcp", nil, a)
 	if err != nil {
 		fmt.Println("Dial failed:", err.Error())
