@@ -14,7 +14,7 @@ func main() {
 	}
 	
 	if flags.Client {
-		client(flags.a)
+		client(flags.a, flags.Name)
 	} else {
 		server(flags.a)
 	}

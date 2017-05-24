@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func client(a *net.TCPAddr) {
+func client(a *net.TCPAddr, lockName string) {
 	conn, err := net.DialTCP("tcp", nil, a)
 	if err != nil {
 		fmt.Println("Dial failed:", err.Error())
@@ -32,7 +32,7 @@ func client(a *net.TCPAddr) {
 	var req LockRequest
 	req.VersionMajor, req.VersionMinor = VersionMajor, VersionMinor
 	req.Command = Acquire
-	req.LockName = "book.dat"
+	req.LockName = lockName
 
 	// Send a response back to person contacting us.
 	err = e.Encode(&req)
