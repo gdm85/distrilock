@@ -1,0 +1,3 @@
+[submodule "vendor/github.com/ogier/pflag"]
+	path = vendor/github.com/ogier/pflag
+	url = https://github.com/ogier/pflag/
