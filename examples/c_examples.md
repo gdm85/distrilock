@@ -1,80 +1,6 @@
-## FILE LOCKING DEMO
+# FILE LOCKING DEMO
 
 (from http://voyager.deanza.edu/~perry/lock.html)
-
-### Write Lock Setter
-```c
-#include <sys/types.h>
-#include <unistd.h>      
-#include <fcntl.h>
-main()
-{
-  int fd;
-  struct flock lock, savelock;
-
-  fd = open("book.dat", O_RDWR);
-  lock.l_type    = F_WRLCK;   /* Test for any lock on any part of file. */
-  lock.l_start   = 0;
-  lock.l_whence  = SEEK_SET;
-  lock.l_len     = 0;        
-  savelock = lock;
-  fcntl(fd, F_GETLK, &lock);  /* Overwrites lock structure with preventors. */
-  if (lock.l_type == F_WRLCK)
-  {
-     printf("Process %ld has a write lock already!\n", lock.l_pid);
-     exit(1);
-  }
-  else if (lock.l_type == F_RDLCK)
-  {
-     printf("Process %ld has a read lock already!\n", lock.l_pid);
-     exit(1);
-  }
-  else
-     fcntl(fd, F_SETLK, &savelock);
-  pause();
-}
-```
-### Read Lock Setter
-
-```c
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-main()
-{
-  struct flock lock, savelock;
-  int fd;
-   
-  fd = open("book.dat", O_RDONLY);
-  lock.l_type = F_RDLCK;
-  lock.l_start = 0;
-  lock.l_whence = SEEK_SET;
-  lock.l_len = 50;
-  savelock = lock;
-  fcntl(fd, F_GETLK, &lock);
-  if (lock.l_type == F_WRLCK)
-  {
-      printf("File is write-locked by process %ld.\n", lock.l_pid);
-      exit(1);
-  }
-  fcntl(fd, F_SETLK, &savelock);
-  pause();
-}
-```
-## SAMPLE PROGRAM EXECUTIONS
-```bash
-$ wl &
-[1]	20866
-$ rl
-File is write-locked by process 20866.
-
-$ rl &
-[1]	20868
-$ wl
-Process 20868 has a read lock already!
-```
 
 ##  Critical Points About File Locking
 
@@ -124,3 +50,78 @@ Process 20868 has a read lock already!
      Just try for the lock with F_SETLK and if fcntl returns a negative
      value then you couldn't get the lock.  F_GETLK is an "info only please"
      request.
+
+
+## Write Lock Setter
+```c
+#include <sys/types.h>
+#include <unistd.h>      
+#include <fcntl.h>
+main()
+{
+  int fd;
+  struct flock lock, savelock;
+
+  fd = open("book.dat", O_RDWR);
+  lock.l_type    = F_WRLCK;   /* Test for any lock on any part of file. */
+  lock.l_start   = 0;
+  lock.l_whence  = SEEK_SET;
+  lock.l_len     = 0;        
+  savelock = lock;
+  fcntl(fd, F_GETLK, &lock);  /* Overwrites lock structure with preventors. */
+  if (lock.l_type == F_WRLCK)
+  {
+     printf("Process %ld has a write lock already!\n", lock.l_pid);
+     exit(1);
+  }
+  else if (lock.l_type == F_RDLCK)
+  {
+     printf("Process %ld has a read lock already!\n", lock.l_pid);
+     exit(1);
+  }
+  else
+     fcntl(fd, F_SETLK, &savelock);
+  pause();
+}
+```
+## Read Lock Setter
+
+```c
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+main()
+{
+  struct flock lock, savelock;
+  int fd;
+   
+  fd = open("book.dat", O_RDONLY);
+  lock.l_type = F_RDLCK;
+  lock.l_start = 0;
+  lock.l_whence = SEEK_SET;
+  lock.l_len = 50;
+  savelock = lock;
+  fcntl(fd, F_GETLK, &lock);
+  if (lock.l_type == F_WRLCK)
+  {
+      printf("File is write-locked by process %ld.\n", lock.l_pid);
+      exit(1);
+  }
+  fcntl(fd, F_SETLK, &savelock);
+  pause();
+}
+```
+## SAMPLE PROGRAM EXECUTIONS
+```bash
+$ wl &
+[1]	20866
+$ rl
+File is write-locked by process 20866.
+
+$ rl &
+[1]	20868
+$ wl
+Process 20868 has a read lock already!
+```
