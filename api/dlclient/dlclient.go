@@ -16,6 +16,8 @@ type Client struct {
 	conn *net.TCPConn
 	d    *gob.Decoder
 	e    *gob.Encoder
+
+	locks map[*Lock]struct{}
 }
 
 type Lock struct {
@@ -29,6 +31,7 @@ func New(endpoint *net.TCPAddr, keepAlive, readTimeout, writeTimeout time.Durati
 		keepAlive:    keepAlive,
 		readTimeout:  readTimeout,
 		writeTimeout: writeTimeout,
+		locks:        map[*Lock]struct{}{},
 	}
 }
 
@@ -74,10 +77,14 @@ func (c *Client) Acquire(lockName string) (*Lock, error) {
 
 	if res.Result == api.Success {
 		// create lock and return it
-		return &Lock{
+		l := &Lock{
 			c:    c,
 			name: lockName,
-		}, nil
+		}
+
+		c.locks[l] = struct{}{}
+
+		return l, nil
 	}
 
 	return nil, fmt.Errorf("%v: %s", res.Result, res.Reason)
@@ -129,6 +136,7 @@ func (l *Lock) Release() error {
 	}
 
 	if res.Result == api.Success {
+		delete(l.c.locks, l)
 		return nil
 	}
 
@@ -160,6 +168,12 @@ func (c *Client) IsLocked(lockName string) (bool, error) {
 
 func (c *Client) Close() error {
 	if c.conn != nil {
+		// explicitly release all locks
+		for l := range c.locks {
+			// ignore release errors
+			l.Release()
+		}
+
 		err := c.conn.Close()
 		c.conn = nil
 		c.d = nil
