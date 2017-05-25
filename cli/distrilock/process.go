@@ -6,6 +6,7 @@ import (
 	"os"
 	"regexp"
 	"sync"
+	"syscall"
 
 	"bitbucket.org/gdm85/go-distrilock/api"
 )
@@ -17,7 +18,7 @@ var (
 	validLockNameRx    = regexp.MustCompile(`^[A-Za-z0-9.\-]+$`)
 )
 
-func processRequest(client *net.TCPConn, req api.LockRequest) api.LockResponse {
+func processRequest(directory string, client *net.TCPConn, req api.LockRequest) api.LockResponse {
 	var res api.LockResponse
 	res.LockRequest = req
 	// override with own version
@@ -32,11 +33,11 @@ func processRequest(client *net.TCPConn, req api.LockRequest) api.LockResponse {
 
 	switch res.Command {
 	case api.Acquire:
-		res.Result, res.Reason = acquire(client, req.LockName)
+		res.Result, res.Reason = acquire(client, req.LockName, directory)
 	case api.Release:
 		res.Result, res.Reason = release(client, req.LockName)
 	case api.Peek:
-		res.Result, res.Reason, res.IsLocked = peek(req.LockName)
+		res.Result, res.Reason, res.IsLocked = peek(req.LockName, directory)
 	default:
 		res.Result = api.BadRequest
 		res.Reason = "unknown command"
@@ -45,31 +46,29 @@ func processRequest(client *net.TCPConn, req api.LockRequest) api.LockResponse {
 	return res
 }
 
-func peek(lockName string) (api.LockCommandResult, string, bool) {
+func peek(lockName, directory string) (api.LockCommandResult, string, bool) {
 	knownResourcesLock.Lock()
 	defer knownResourcesLock.Unlock()
 
 	f, ok := knownResources[lockName]
-	if !ok {
-		var err error
-		// differently from acquire(), file must exist here
-		f, err = os.OpenFile(lockName, os.O_RDWR, 0664)
-		if err != nil {
-			return api.InternalError, err.Error(), false
+	if ok {
+		//TODO: perhaps check that file is really UNLCK?
+		return api.Success, "", true
+	}
+	var err error
+	// differently from acquire(), file must exist here
+	f, err = os.OpenFile(directory+lockName, os.O_RDWR, 0664)
+	if err != nil {
+		if e, ok := err.(*os.PathError); ok {
+			if e.Err == syscall.ENOENT {
+				return api.Success, "", false
+			}
 		}
-
-		isWriteLocked, err := peekLock(f)
-		f.Close()
-		if err != nil {
-			return api.InternalError, err.Error(), false
-		}
-
-		// successful lock acquire
-		return api.Success, "", isWriteLocked
+		return api.InternalError, err.Error(), false
 	}
 
-	// file is not closed here
 	isWriteLocked, err := peekLock(f)
+	f.Close()
 	if err != nil {
 		return api.InternalError, err.Error(), false
 	}
@@ -100,19 +99,21 @@ func release(client *net.TCPConn, lockName string) (api.LockCommandResult, strin
 		return api.Denied, "resource acquired in a different session"
 	}
 
+	delete(knownResources, lockName)
 	delete(resourceAcquiredBy, f)
-	f.Close()
+	_ = f.Close()
+
 	return api.Success, ""
 }
 
-func acquire(client *net.TCPConn, lockName string) (api.LockCommandResult, string) {
+func acquire(client *net.TCPConn, lockName, directory string) (api.LockCommandResult, string) {
 	knownResourcesLock.Lock()
 	defer knownResourcesLock.Unlock()
 
 	f, ok := knownResources[lockName]
 	if !ok {
 		var err error
-		f, err = os.OpenFile(lockName, os.O_RDWR|os.O_CREATE, 0664)
+		f, err = os.OpenFile(directory+lockName, os.O_RDWR|os.O_CREATE, 0664)
 		if err != nil {
 			return api.InternalError, err.Error()
 		}

@@ -16,7 +16,7 @@ run: build
 	bin/distrilock
 
 test:
-	go test $(PKGS)
+	scripts/run-tests.sh $(PKGS)
 
 simplify:
 	gofmt -w -s cli/distrilock/*.go api/*.go api/dlclient/*.go

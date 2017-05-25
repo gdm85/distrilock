@@ -28,6 +28,7 @@ func peekLock(fi *os.File) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+
 	// lock could be write or read, but caller desires to know whether it is lockable or not
 	return lt.Type != syscall.F_UNLCK, nil
 }

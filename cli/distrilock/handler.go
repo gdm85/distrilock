@@ -11,7 +11,7 @@ import (
 )
 
 // Handles incoming requests.
-func handleRequest(conn *net.TCPConn) {
+func handleRequest(directory string, conn *net.TCPConn) {
 	// setup keep-alive
 	err := conn.SetKeepAlive(true)
 	if err != nil {
@@ -43,7 +43,7 @@ func handleRequest(conn *net.TCPConn) {
 			continue
 		}
 
-		res := processRequest(conn, req)
+		res := processRequest(directory, conn, req)
 
 		// Send a response back to person contacting us.
 		err = e.Encode(&res)

@@ -10,8 +10,8 @@ import (
 const defaultTestAddress = ":63419"
 
 var (
-	defaultTestAddr *net.TCPAddr
-	testClient      *Client
+	defaultTestAddr         *net.TCPAddr
+	testClient, testClient2 *Client
 )
 
 func init() {
@@ -22,6 +22,7 @@ func init() {
 	}
 
 	testClient = New(defaultTestAddr, time.Second*3, time.Second*2, time.Second*2)
+	testClient2 = New(defaultTestAddr, time.Second*3, time.Second*2, time.Second*2)
 }
 
 func TestMain(m *testing.M) {

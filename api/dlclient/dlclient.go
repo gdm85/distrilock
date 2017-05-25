@@ -20,6 +20,15 @@ type Client struct {
 	locks map[*Lock]struct{}
 }
 
+type ClientError struct {
+	Result api.LockCommandResult
+	Reason string
+}
+
+func (e *ClientError) Error() string {
+	return fmt.Sprintf("%v: %s", e.Result, e.Reason)
+}
+
 type Lock struct {
 	c    *Client
 	name string
@@ -87,7 +96,7 @@ func (c *Client) Acquire(lockName string) (*Lock, error) {
 		return l, nil
 	}
 
-	return nil, fmt.Errorf("%v: %s", res.Result, res.Reason)
+	return nil, &ClientError{Result: res.Result, Reason: res.Reason}
 }
 
 func (c *Client) do(req *api.LockRequest) (*api.LockResponse, error) {
@@ -163,7 +172,7 @@ func (c *Client) IsLocked(lockName string) (bool, error) {
 		return res.IsLocked, nil
 	}
 
-	return false, fmt.Errorf("%v: %s", res.Result, res.Reason)
+	return false, &ClientError{Result: res.Result, Reason: res.Reason}
 }
 
 func (c *Client) Close() error {

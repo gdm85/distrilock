@@ -30,6 +30,6 @@ func main() {
 			os.Exit(1)
 		}
 		// Handle connections in a new goroutine.
-		go handleRequest(conn)
+		go handleRequest(flags.Directory, conn)
 	}
 }

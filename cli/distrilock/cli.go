@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"path/filepath"
 
 	flag "github.com/ogier/pflag"
 )
@@ -14,8 +15,8 @@ const defaultAddress = ":13123"
 type flags struct {
 	*flag.FlagSet
 
-	Address string
-	Name    string
+	Address   string
+	Directory string
 
 	// some parsed options
 	a *net.TCPAddr
@@ -30,8 +31,9 @@ func mustParseFlags(args []string) (*flags, error) {
 	f.FlagSet = flag.NewFlagSet(args[0], flag.ExitOnError)
 
 	f.FlagSet.StringVarP(&f.Address, "address", "a", defaultAddress, "address to listen on")
+	f.FlagSet.StringVarP(&f.Directory, "directory", "d", ".", "directory where to locate locked files")
 	f.FlagSet.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: distrilock [--address %s]\n\n", defaultAddress)
+		fmt.Fprintf(os.Stderr, "Usage: distrilock [--address=%s] [--directory=.]\n\n", defaultAddress)
 		flag.PrintDefaults()
 	}
 
@@ -49,6 +51,13 @@ func mustParseFlags(args []string) (*flags, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// validate directory
+	f.Directory, err = filepath.Abs(f.Directory)
+	if err != nil {
+		return nil, err
+	}
+	f.Directory += "/"
 
 	return &f, nil
 }
