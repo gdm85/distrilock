@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"os"
 	"time"
 
 	"bitbucket.org/gdm85/go-distrilock/api"
@@ -33,13 +34,13 @@ func handleRequest(directory string, conn *net.TCPConn) {
 				// other end interrupted connection
 				break
 			}
-			fmt.Println("Error reading:", err.Error())
+			fmt.Fprintln(os.Stderr, "error reading:", err.Error())
 			continue
 		}
-		fmt.Println("received request:", req)
+		//fmt.Println("received request:", req)
 
 		if req.VersionMajor > api.VersionMajor {
-			fmt.Println("skipping request with superior major version")
+			fmt.Fprintln(os.Stderr, "skipping request with superior major version")
 			continue
 		}
 
@@ -52,7 +53,7 @@ func handleRequest(directory string, conn *net.TCPConn) {
 				// other end interrupted connection
 				break
 			}
-			fmt.Println("Error writing:", err.Error())
+			fmt.Fprintln(os.Stderr, "Error writing:", err.Error())
 			continue
 		}
 	}

@@ -13,4 +13,4 @@ B=$!
 
 trap "kill $A $B; rm -rf '$TMPD'" EXIT
 
-go test "$@"
+go test -bench=. -benchtime=0.2s "$@"
