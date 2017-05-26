@@ -18,7 +18,7 @@ func acquireLockDirect(fi *os.File) error {
 	return syscall.FcntlFlock(fd, syscall.F_SETLK, &lt)
 }
 
-func peekLock(fi *os.File) (bool, error) {
+func isUnlocked(fi *os.File) (bool, error) {
 	fd := fi.Fd()
 	var lt syscall.Flock_t
 	lt.Type = syscall.F_WRLCK
@@ -29,8 +29,8 @@ func peekLock(fi *os.File) (bool, error) {
 		return false, err
 	}
 
-	// lock could be write or read, but caller desires to know whether it is lockable or not
-	return lt.Type != syscall.F_UNLCK, nil
+	// lock could be write or read, but caller desires to know whether it is unlocked or not
+	return lt.Type == syscall.F_UNLCK, nil
 }
 
 func releaseLock(f *os.File) error {

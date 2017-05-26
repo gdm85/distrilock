@@ -67,14 +67,13 @@ func peek(lockName, directory string) (api.LockCommandResult, string, bool) {
 		return api.InternalError, err.Error(), false
 	}
 
-	isWriteLocked, err := peekLock(f)
+	isUnlocked, err := isUnlocked(f)
 	f.Close()
 	if err != nil {
 		return api.InternalError, err.Error(), false
 	}
 
-	// successful lock acquire
-	return api.Success, "", isWriteLocked
+	return api.Success, "", !isUnlocked
 }
 
 func release(client *net.TCPConn, lockName string) (api.LockCommandResult, string) {
