@@ -121,6 +121,13 @@ func acquire(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 		err = acquireLockDirect(f)
 		if err != nil {
 			f.Close()
+
+			if e, ok := err.(syscall.Errno); ok {
+				if e == syscall.EAGAIN || e == syscall.EACCES { // to be POSIX-compliant, both errors must be checked
+					return api.Failed, "resource acquired by different process"
+				}
+			}
+
 			return api.InternalError, err.Error()
 		}
 
