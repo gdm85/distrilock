@@ -11,6 +11,15 @@ A=$!
 bin/distrilock --address=:63420 --directory="$TMPD" &
 B=$!
 
-trap "kill $A $B; rm -rf '$TMPD'" EXIT
+if [ ! -z "$NFS_SHARE" ]; then
+	## server process C, NFS share
+	bin/distrilock --address=:63421 --directory="$NFS_SHARE" &
+	C=$!
+	OPTS=""
+else
+	OPTS="-short"
+fi
 
-go test -bench=. -benchtime=0.2s "$@"
+trap "kill $A $B $C; rm -rf '$TMPD'" EXIT
+
+go test $OPTS -bench=. -benchtime=0.2s "$@"
