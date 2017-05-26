@@ -16,7 +16,7 @@ func init() {
 func TestAcquireAndRelease(t *testing.T) {
 	lockName := fmt.Sprintf("testing-%d", rand.Int())
 
-	l, err := testClient.Acquire(lockName)
+	l, err := testClientA1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -30,7 +30,7 @@ func TestReleaseNonExisting(t *testing.T) {
 	lockName := fmt.Sprintf("testing-%d", rand.Int())
 
 	l := &Lock{
-		c:    testClient,
+		c:    testClientA1,
 		name: lockName,
 	}
 
@@ -43,7 +43,7 @@ func TestReleaseNonExisting(t *testing.T) {
 func TestPeekNonExisting(t *testing.T) {
 	lockName := fmt.Sprintf("testing-%d", rand.Int())
 
-	isLocked, err := testClient.IsLocked(lockName)
+	isLocked, err := testClientA1.IsLocked(lockName)
 	if err != nil || isLocked {
 		t.Error("expected no error and no lock, but got", err, isLocked)
 	}
@@ -52,12 +52,12 @@ func TestPeekNonExisting(t *testing.T) {
 func TestPeekExisting(t *testing.T) {
 	lockName := fmt.Sprintf("testing-%d", rand.Int())
 
-	l, err := testClient.Acquire(lockName)
+	l, err := testClientA1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	isLocked, err := testClient.IsLocked(lockName)
+	isLocked, err := testClientA1.IsLocked(lockName)
 	if err != nil || !isLocked {
 		t.Error("expected no error and lock acquired, but got", err, isLocked)
 		return
@@ -75,12 +75,12 @@ func TestPeekStale(t *testing.T) {
 func TestAcquireTwice(t *testing.T) {
 	lockName := fmt.Sprintf("testing-%d", rand.Int())
 
-	l1, err := testClient.Acquire(lockName)
+	l1, err := testClientA1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	l2, err := testClient.Acquire(lockName)
+	l2, err := testClientA1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -98,12 +98,12 @@ func TestAcquireTwice(t *testing.T) {
 func TestAcquireContention(t *testing.T) {
 	lockName := fmt.Sprintf("testing-%d", rand.Int())
 
-	l1, err := testClient.Acquire(lockName)
+	l1, err := testClientA1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = testClient2.Acquire(lockName)
+	_, err = testClientA2.Acquire(lockName)
 	if err == nil {
 		t.Fatal("expected failure to acquire lock already acquired from other session")
 	}
@@ -116,7 +116,7 @@ func TestAcquireContention(t *testing.T) {
 	}
 
 	// check that lock is acquired from 2nd client's perspective
-	isLocked, err := testClient2.IsLocked(lockName)
+	isLocked, err := testClientA2.IsLocked(lockName)
 	if err != nil || !isLocked {
 		t.Error("expected no error and lock acquired, but got", err, isLocked)
 		return
@@ -127,7 +127,7 @@ func TestAcquireContention(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	l2, err := testClient2.Acquire(lockName)
+	l2, err := testClientA2.Acquire(lockName)
 	if err != nil {
 		t.Fatal("expected success to acquire lock after it was released, got", err)
 	}

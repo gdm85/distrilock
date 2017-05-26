@@ -7,22 +7,23 @@ import (
 	"time"
 )
 
-const defaultTestAddress = ":63419"
+const (
+	defaultServerA = ":63419"
+	defaultServerB = ":63420"
+)
 
 var (
-	defaultTestAddr         *net.TCPAddr
-	testClient, testClient2 *Client
+	testClientA1, testClientA2 *Client
 )
 
 func init() {
-	var err error
-	defaultTestAddr, err = net.ResolveTCPAddr("tcp", defaultTestAddress)
+	a, err := net.ResolveTCPAddr("tcp", defaultServerA)
 	if err != nil {
 		panic(err)
 	}
 
-	testClient = New(defaultTestAddr, time.Second*3, time.Second*2, time.Second*2)
-	testClient2 = New(defaultTestAddr, time.Second*3, time.Second*2, time.Second*2)
+	testClientA1 = New(a, time.Second*3, time.Second*2, time.Second*2)
+	testClientA2 = New(a, time.Second*3, time.Second*2, time.Second*2)
 }
 
 func TestMain(m *testing.M) {
