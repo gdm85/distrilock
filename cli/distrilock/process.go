@@ -16,7 +16,7 @@ const lockExt = ".lck"
 var (
 	knownResources     = map[string]*os.File{}
 	resourceAcquiredBy = map[*os.File]*net.TCPConn{}
-	knownResourcesLock sync.Mutex
+	knownResourcesLock sync.RWMutex
 	validLockNameRx    = regexp.MustCompile(`^[A-Za-z0-9.\-]+$`)
 )
 
@@ -75,37 +75,56 @@ func processDisconnect(client *net.TCPConn) {
 	knownResourcesLock.Unlock()
 }
 
+func shortAcquire(client *net.TCPConn, f *os.File, fullLock bool) (api.LockCommandResult, string) {
+	// check if lock was acquired by a different client
+	by, ok := resourceAcquiredBy[f]
+	if fullLock {
+		knownResourcesLock.Unlock()
+	} else {
+		knownResourcesLock.RUnlock()
+	}
+	if !ok {
+		panic("BUG: missing resource acquired by record")
+	}
+	if by != client {
+		return api.Failed, "resource acquired through a different session"
+	}
+
+	// already acquired by self
+	//TODO: this is a no-operation, should lock be acquired again with fcntl?
+	//		and what if the re-acquisition fails? that would perhaps qualify
+	//		as a different lock command?
+	return api.Success, "no-op"
+}
+
 func acquire(client *net.TCPConn, lockName, directory string) (api.LockCommandResult, string) {
-	knownResourcesLock.Lock()
-	defer knownResourcesLock.Unlock()
+	knownResourcesLock.RLock()
 
 	f, ok := knownResources[lockName]
 	if ok {
-		// check if lock was acquired by a different client
-		by, ok := resourceAcquiredBy[f]
-		if !ok {
-			panic("BUG: missing resource acquired by record")
-		}
-		if by != client {
-			return api.Failed, "resource acquired through a different session"
-		}
+		return shortAcquire(client, f, false)
+	}
+	knownResourcesLock.RUnlock()
+	knownResourcesLock.Lock()
 
-		// already acquired by self
-		//TODO: this is a no-operation, should lock be acquired again with fcntl?
-		//		and what if the re-acquisition fails? that would perhaps qualify
-		//		as a different lock command?
-		return api.Success, "no-op"
+	// check again, as meanwhile lock could have been created
+	f, ok = knownResources[lockName]
+	if ok {
+		return shortAcquire(client, f, true)
 	}
 
 	var err error
 	f, err = os.OpenFile(directory+lockName+lockExt, os.O_RDWR|os.O_CREATE, 0664)
 	if err != nil {
+		knownResourcesLock.Unlock()
+
 		return api.InternalError, err.Error()
 	}
 
 	err = acquireLockDirect(f)
 	if err != nil {
 		f.Close()
+		knownResourcesLock.Unlock()
 
 		if e, ok := err.(syscall.Errno); ok {
 			if e == syscall.EAGAIN || e == syscall.EACCES { // to be POSIX-compliant, both errors must be checked
@@ -119,19 +138,22 @@ func acquire(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 	_, err = f.Write([]byte(fmt.Sprintf("locked by %v", client.RemoteAddr())))
 	if err != nil {
 		f.Close()
+		knownResourcesLock.Unlock()
+
 		return api.InternalError, err.Error()
 	}
 
 	resourceAcquiredBy[f] = client
 	knownResources[lockName] = f
+	knownResourcesLock.Unlock()
 
 	// successful lock acquire
 	return api.Success, ""
 }
 
 func peek(lockName, directory string) (api.LockCommandResult, string, bool) {
-	knownResourcesLock.Lock()
-	defer knownResourcesLock.Unlock()
+	knownResourcesLock.RLock()
+	defer knownResourcesLock.RUnlock()
 
 	f, ok := knownResources[lockName]
 	if ok {
@@ -140,7 +162,7 @@ func peek(lockName, directory string) (api.LockCommandResult, string, bool) {
 	}
 	var err error
 	// differently from acquire(), file must exist here
-	f, err = os.OpenFile(directory+lockName+lockExt, os.O_RDWR, 0664)
+	f, err = os.OpenFile(directory+lockName+lockExt, os.O_RDONLY, 0664)
 	if err != nil {
 		if e, ok := err.(*os.PathError); ok {
 			if e.Err == syscall.ENOENT {
@@ -167,10 +189,6 @@ func release(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 	if !ok {
 		return api.Failed, "lock not found"
 	}
-	err := releaseLock(f)
-	if err != nil {
-		return api.InternalError, err.Error()
-	}
 
 	// check if lock was acquired by a different client
 	by, ok := resourceAcquiredBy[f]
@@ -179,6 +197,11 @@ func release(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 	}
 	if by != client {
 		return api.Failed, "resource acquired through a different session"
+	}
+
+	err := releaseLock(f)
+	if err != nil {
+		return api.InternalError, err.Error()
 	}
 
 	delete(knownResources, lockName)

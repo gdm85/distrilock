@@ -213,7 +213,7 @@ func TestAcquireTwiceRaceNFS(t *testing.T) {
 	pfix := generateLockName(t)
 
 	var wg sync.WaitGroup
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 1100; i++ {
 		lockName := fmt.Sprintf("%s-%d", pfix, i)
 
 		wg.Add(1)

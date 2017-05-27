@@ -18,6 +18,12 @@ run: build
 test:
 	scripts/run-tests.sh $(PKGS)
 
+benchmark:
+	scripts/run-tests.sh -bench=. -benchtime=1s $(PKGS)
+
+race:
+	scripts/run-tests.sh -race $(PKGS)
+
 simplify:
 	gofmt -w -s cli/distrilock/*.go api/*.go api/dlclient/*.go
 
@@ -50,4 +56,4 @@ errcheck:
 clean:
 	rm -rf bin/ docs/
 
-.PHONY: all build test clean godoc errcheck codeqa codeqa-tools vet lint godoc-tool godoc-static vendor
+.PHONY: all build test clean godoc errcheck codeqa codeqa-tools vet lint godoc-tool godoc-static vendor benchmark race
