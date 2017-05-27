@@ -1,7 +1,4 @@
-// This package contains the command line interface executable 'distrilock'.
-// To read its command line help, run:
-/* $ bin/distrilock --help */
-package main
+package core
 
 import (
 	"os"

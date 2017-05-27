@@ -10,14 +10,17 @@ import (
 	"time"
 
 	"bitbucket.org/gdm85/go-distrilock/api"
+	"bitbucket.org/gdm85/go-distrilock/api/core"
 
 	"github.com/gorilla/websocket"
 )
 
 func handleRequests(directory string, wsconn *websocket.Conn, keepAlivePeriod time.Duration) {
+	var conn *net.TCPConn
 	{
+		var ok bool
 		c := wsconn.UnderlyingConn()
-		conn, ok := c.(*net.TCPConn)
+		conn, ok = c.(*net.TCPConn)
 		if !ok {
 			fmt.Fprintf(os.Stderr, "found connection type %T, but %T expected\n", c, conn)
 			return
@@ -79,7 +82,7 @@ Loop:
 			continue
 		}
 
-		res := processRequest(directory, wsconn, req)
+		res := core.ProcessRequest(directory, conn, req)
 
 		// reply with same type as last message
 		w, err := wsconn.NextWriter(messageType)
@@ -123,5 +126,5 @@ Loop:
 	wsconn.Close()
 	//fmt.Println("a client disconnected")
 
-	processDisconnect(wsconn)
+	core.ProcessDisconnect(conn)
 }

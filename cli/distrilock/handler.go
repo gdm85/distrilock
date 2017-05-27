@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"bitbucket.org/gdm85/go-distrilock/api"
+	"bitbucket.org/gdm85/go-distrilock/api/core"
 )
 
 func handleRequests(directory string, conn *net.TCPConn, keepAlivePeriod time.Duration) {
@@ -45,7 +46,7 @@ func handleRequests(directory string, conn *net.TCPConn, keepAlivePeriod time.Du
 			continue
 		}
 
-		res := processRequest(directory, conn, req)
+		res := core.ProcessRequest(directory, conn, req)
 
 		err = e.Encode(&res)
 		if err != nil {
@@ -61,5 +62,5 @@ func handleRequests(directory string, conn *net.TCPConn, keepAlivePeriod time.Du
 	conn.Close()
 	//fmt.Println("a client disconnected")
 
-	processDisconnect(conn)
+	core.ProcessDisconnect(conn)
 }

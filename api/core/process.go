@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"fmt"
@@ -20,7 +20,7 @@ var (
 	validLockNameRx    = regexp.MustCompile(`^[A-Za-z0-9.\-]+$`)
 )
 
-func processRequest(directory string, client *net.TCPConn, req api.LockRequest) api.LockResponse {
+func ProcessRequest(directory string, client *net.TCPConn, req api.LockRequest) api.LockResponse {
 	var res api.LockResponse
 	res.LockRequest = req
 	// override with own version
@@ -50,7 +50,7 @@ func processRequest(directory string, client *net.TCPConn, req api.LockRequest) 
 	return res
 }
 
-func processDisconnect(client *net.TCPConn) {
+func ProcessDisconnect(client *net.TCPConn) {
 	knownResourcesLock.Lock()
 
 	var filesToDrop []*os.File
