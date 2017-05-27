@@ -26,7 +26,7 @@ func (c *tcpClient) String() string {
 	return fmt.Sprintf("%v", c.conn)
 }
 
-// New returns a new distrilock client; no connection is performed.
+// New returns a new distrilock client; no connection is performed until the client is actually used.
 func New(endpoint *net.TCPAddr, keepAlive, readTimeout, writeTimeout time.Duration) client.Client {
 	return bclient.New(&tcpClient{
 		endpoint:     endpoint,
