@@ -71,7 +71,7 @@ func createClient(a *net.TCPAddr) *Client {
 }
 
 func createSlowClient(a *net.TCPAddr) *Client {
-	return New(a, time.Second*3, time.Second*30, time.Second*15)
+	return New(a, time.Second*3, time.Second*15, time.Second*15)
 }
 
 func TestMain(m *testing.M) {

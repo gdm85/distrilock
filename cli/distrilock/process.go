@@ -11,6 +11,8 @@ import (
 	"bitbucket.org/gdm85/go-distrilock/api"
 )
 
+const lockExt = ".lck"
+
 var (
 	knownResources     = map[string]*os.File{}
 	resourceAcquiredBy = map[*os.File]*net.TCPConn{}
@@ -80,7 +82,7 @@ func acquire(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 	f, ok := knownResources[lockName]
 	if !ok {
 		var err error
-		f, err = os.OpenFile(directory+lockName, os.O_RDWR|os.O_CREATE, 0664)
+		f, err = os.OpenFile(directory+lockName+lockExt, os.O_RDWR|os.O_CREATE, 0664)
 		if err != nil {
 			return api.InternalError, err.Error()
 		}
@@ -98,7 +100,7 @@ func acquire(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 			return api.InternalError, err.Error()
 		}
 
-		_, err = f.Write([]byte(fmt.Sprintf("%p", client)))
+		_, err = f.Write([]byte(fmt.Sprintf("locked by %v", client.RemoteAddr())))
 		if err != nil {
 			f.Close()
 			return api.InternalError, err.Error()
@@ -138,7 +140,7 @@ func peek(lockName, directory string) (api.LockCommandResult, string, bool) {
 	}
 	var err error
 	// differently from acquire(), file must exist here
-	f, err = os.OpenFile(directory+lockName, os.O_RDWR, 0664)
+	f, err = os.OpenFile(directory+lockName+lockExt, os.O_RDWR, 0664)
 	if err != nil {
 		if e, ok := err.(*os.PathError); ok {
 			if e.Err == syscall.ENOENT {
@@ -182,7 +184,7 @@ func release(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 	delete(knownResources, lockName)
 	delete(resourceAcquiredBy, f)
 	_ = f.Close()
-	err = os.Remove(directory + lockName)
+	err = os.Remove(directory + lockName + lockExt)
 	if err != nil {
 		return api.InternalError, err.Error()
 	}
@@ -219,12 +221,6 @@ func verifyOwnership(client *net.TCPConn, lockName, directory string) (api.LockC
 			}
 		}
 
-		return api.InternalError, err.Error()
-	}
-
-	_, err = f.Write([]byte(fmt.Sprintf("%p", client)))
-	if err != nil {
-		f.Close()
 		return api.InternalError, err.Error()
 	}
 
