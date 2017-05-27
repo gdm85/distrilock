@@ -118,7 +118,7 @@ func (c *websocketClient) Do(req *api.LockRequest) (*api.LockResponse, error) {
 		return nil, err
 	}
 	if messageType != c.messageType {
-		return nil, fmt.Errorf("got message type %s but %s expected", messageType, c.messageType)
+		return nil, fmt.Errorf("got message type %d but %s expected", messageType, c.messageType)
 	}
 	if c.messageType == websocket.BinaryMessage {
 		d := gob.NewDecoder(r)
