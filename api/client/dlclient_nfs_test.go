@@ -1,4 +1,4 @@
-package dlclient
+package api
 
 import (
 	"fmt"
