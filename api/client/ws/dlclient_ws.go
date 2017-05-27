@@ -1,60 +1,56 @@
 package dlclientws
 
 import (
-	"encoding/gob"
 	"fmt"
 	"net"
 	"time"
+	"encoding/gob"
 
-	"bitbucket.org/gdm85/go-distrilock/api"
 	"bitbucket.org/gdm85/go-distrilock/api/client"
+	"bitbucket.org/gdm85/go-distrilock/api"
+	"bitbucket.org/gdm85/go-distrilock/api/client/internal/base"
 	
 	"github.com/gorilla/websocket"
 )
 
-// Client is a single-connection, non-concurrency-safe client to a distrilock daemon.
-type Client struct {
+// WebsocketClient is a single-connection, non-concurrency-safe client to a distrilock websocket daemon in binary or JSON mode.
+type WebsocketClient struct {
 	endpoint                             string
+	keepAlive time.Duration
+	readTimeout, writeTimeout time.Duration
 	conn *websocket.Conn
 	messageType int
-
-	keepAlive, readTimeout, writeTimeout time.Duration
-	locks map[*client.Lock]struct{}
 }
 
 // String returns a summary of the client connection and active locks.
-func (c *Client) String() string {
-	return fmt.Sprintf("%v with %d locks", c.conn, len(c.locks))
+func (c *WebsocketClient) String() string {
+	return fmt.Sprintf("%v", c.conn)
 }
 
 // NewBinary returns a new binary distrilock websocket client; no connection is performed.
-func NewBinary(endpoint string, keepAlive, readTimeout, writeTimeout time.Duration) *Client {
-	return &Client{
+func NewBinary(endpoint string, keepAlive, readTimeout, writeTimeout time.Duration) client.Client {
+	return bclient.New(&WebsocketClient{
 		endpoint:     endpoint,
-		keepAlive:    keepAlive,
-		readTimeout:  readTimeout,
+		readTimeout: readTimeout,
 		writeTimeout: writeTimeout,
-		locks:        map[*client.Lock]struct{}{},
-		
+		keepAlive: keepAlive,
 		messageType : websocket.BinaryMessage,
-	}
+	})
 }
 
 // NewJSON returns a new JSON distrilock websocket client; no connection is performed.
-func NewJSON(endpoint string, keepAlive, readTimeout, writeTimeout time.Duration) *Client {
-	return &Client{
+func NewJSON(endpoint string, keepAlive, readTimeout, writeTimeout time.Duration) client.Client {
+	return bclient.New(&WebsocketClient{
 		endpoint:     endpoint,
-		keepAlive:    keepAlive,
-		readTimeout:  readTimeout,
+		keepAlive: keepAlive,
+		readTimeout: readTimeout,
 		writeTimeout: writeTimeout,
-		locks:        map[*client.Lock]struct{}{},
-		
 		messageType : websocket.TextMessage,
-	}
+	})
 }
 
 // acquireConn is called every time a connection would be necessary; it does nothing if connection has already been made. It will re-estabilish a connection if Client c had been closed before.
-func (c *Client) acquireConn() error {
+func (c *WebsocketClient) AcquireConn() error {
 	if c.conn == nil {
 		var err error
 		c.conn, _, err = websocket.DefaultDialer.Dial(c.endpoint, nil)
@@ -79,5 +75,69 @@ func (c *Client) acquireConn() error {
 			}
 		}
 	}
+	return nil
+}
+
+
+func (c *WebsocketClient) Do(req *api.LockRequest) (*api.LockResponse, error) {
+	if c.writeTimeout != 0 {
+		err := c.conn.SetWriteDeadline(time.Now().Add(c.writeTimeout))
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	w, err := c.conn.NextWriter(c.messageType)
+	if err != nil {
+		return nil, err
+	}
+	
+	e := gob.NewEncoder(w)
+	err = e.Encode(&req)
+	w.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	// wait for a response
+	var res api.LockResponse
+	if c.readTimeout != 0 {
+		err := c.conn.SetReadDeadline(time.Now().Add(c.readTimeout))
+		if err != nil {
+			return nil, err
+		}
+	}
+	
+	messageType, r, err := c.conn.NextReader()
+	if err != nil {
+		return nil, err
+	}
+	if messageType != c.messageType {
+		return nil, fmt.Errorf("got message type %s but %s expected", messageType, c.messageType)
+	}
+	d := gob.NewDecoder(r)
+	err = d.Decode(&res)
+	if err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
+
+func (c *WebsocketClient) Close() error {
+	if c.conn == nil {
+		return nil
+	}
+	err := c.conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+	if err != nil {
+		return err
+	}
+	
+	err = c.conn.Close()
+	if err != nil {
+		return err
+	}
+	c.conn = nil
+	
 	return nil
 }

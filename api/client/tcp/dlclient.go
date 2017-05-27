@@ -13,12 +13,11 @@ import (
 // Client is a single-connection, non-concurrency-safe client to a distrilock daemon.
 type Client struct {
 	endpoint                             *net.TCPAddr
-	keepAlive, readTimeout, writeTimeout time.Duration
-
 	conn *net.TCPConn
 	d    *gob.Decoder
 	e    *gob.Encoder
 
+	keepAlive, readTimeout, writeTimeout time.Duration
 	locks map[*client.Lock]struct{}
 }
 
@@ -174,23 +173,6 @@ func (c *Client) IsLocked(lockName string) (bool, error) {
 	return false, &client.Error{Result: res.Result, Reason: res.Reason}
 }
 
-// Close will release all active locks and close the connection.
-func (c *Client) Close() error {
-	if c.conn != nil {
-		// explicitly release all locks
-		for l := range c.locks {
-			// ignore release errors
-			l.Release()
-		}
-
-		err := c.conn.Close()
-		c.conn = nil
-		c.d = nil
-		c.e = nil
-		return err
-	}
-	return nil
-}
 
 // Verify will verify that the lock is currently held by the client and healthy.
 func (c *Client) Verify(l *client.Lock) error {
@@ -217,4 +199,19 @@ func (c *Client) Verify(l *client.Lock) error {
 	}
 
 	return &client.Error{Result: res.Result, Reason: res.Reason}
+}
+
+func (c *Client) Close() error {
+	if c.conn == nil {
+		return nil
+	}
+	err := c.conn.Close()
+	if err != nil {
+		return err
+	}
+	c.conn = nil
+	c.d = nil
+	c.e = nil
+	
+	return nil
 }
