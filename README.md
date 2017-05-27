@@ -47,9 +47,54 @@ ok  	bitbucket.org/gdm85/go-distrilock/api/client	0.017s
 ?   	bitbucket.org/gdm85/go-distrilock/api/client/tcp	[no test files]
 ?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock-ws	[no test files]
 ?   	bitbucket.org/gdm85/go-distrilock/api/client/ws	[no test files]
-scripts/run-tests.sh: line 1: 32663 Terminated              bin/$SVC --address=localhost:$BASE --directory="$TMPD"
-scripts/run-tests.sh: line 1: 32664 Terminated              bin/$SVC --address=localhost:$[BASE+1] --directory="$TMPD"
 ```
+
+The binaries `bin/distrilock` (TCP daemon) and `bin/distrilock-ws` (Websockets daemon) will be available.
+
+## Tests
+
+Test targets will start multiple distrilock daemons and terminate them at end of test run.
+Normal tests (`make test`) are executed by default when building; in order to execute the NFS-specific tests, provide the following changes:
+
+* add a host called `sibling` in your `/etc/hosts` pointing to a second machine running NFSv4
+* run tests with `NFS_SHARE=/mnt/your-nfs-share make test`
+
+Race condition tests:
+```bash
+$ make race
+```
+
+Benchmark tests:
+```bash
+$ make benchmark
+scripts/run-tests.sh -bench=. -benchtime=1s ./cli ./cli/distrilock ./api ./api/client ./api/core ./api/client/tcp ./cli/distrilock-ws ./api/client/ws
+Running all tests
+distrilock: listening on :63419
+distrilock-ws: listening on localhost:63519
+distrilock-ws: listening on localhost:63520
+distrilock: listening on :63420
+?   	bitbucket.org/gdm85/go-distrilock/cli	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api	[no test files]
+BenchmarkLocksTaking/TCP_clients_suite_random_locks-4         	    5000	    238941 ns/op
+BenchmarkLocksTaking/TCP_clients_suite_fixed_locks-4          	   10000	    470427 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_random_locks-4         	    3000	    496537 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_fixed_locks-4          	    3000	    488305 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_random_locks-4           	    5000	    307426 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_fixed_locks-4            	    5000	    299666 ns/op
+PASS
+ok  	bitbucket.org/gdm85/go-distrilock/api/client	12.126s
+?   	bitbucket.org/gdm85/go-distrilock/api/core	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/tcp	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock-ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/ws	[no test files]
+```
+
+## Other Makefile targets
+
+* **codeqa** runs various code quality measurements like `go vet`, `golint` and `errcheck`.
+* **godoc** runs a local godoc HTTP server to explore package documentation
+* **godoc-static** will store locally in `docs/` directory the HTML files for godoc package documentation
 
 ## Relevant links
 

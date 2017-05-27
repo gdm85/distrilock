@@ -18,9 +18,9 @@ func TestAcquireContentionNFS(t *testing.T) {
 		cs := cs
 		t.Run(cs.name, func(t *testing.T) {
 			t.Parallel()
-			
+
 			lockName := generateLockName(t)
-			
+
 			l1, err := cs.testClientC1.Acquire(lockName)
 			if err != nil {
 				t.Error(err)
@@ -78,7 +78,7 @@ func TestAcquireAndReleaseNFS(t *testing.T) {
 		cs := cs
 		t.Run(cs.name, func(t *testing.T) {
 			t.Parallel()
-			
+
 			lockName := generateLockName(t)
 
 			l, err := cs.testClientC1.Acquire(lockName)
@@ -115,7 +115,7 @@ func TestAcquireTwiceNFS(t *testing.T) {
 		cs := cs
 		t.Run(cs.name, func(t *testing.T) {
 			t.Parallel()
-			
+
 			lockName := generateLockName(t)
 
 			l1, err := cs.testClientC1.Acquire(lockName)
@@ -148,7 +148,7 @@ func TestAcquireAfterReleaseNFS(t *testing.T) {
 		cs := cs
 		t.Run(cs.name, func(t *testing.T) {
 			t.Parallel()
-			
+
 			lockName := generateLockName(t)
 
 			l1, err := cs.testClientC1.Acquire(lockName)
@@ -207,7 +207,7 @@ func disabledTestAcquireRaceNFS(t *testing.T) {
 		cs := cs
 		t.Run(cs.name, func(t *testing.T) {
 			t.Parallel()
-			
+
 			pfix := generateLockName(t)
 
 			var wg sync.WaitGroup
@@ -267,7 +267,7 @@ func TestAcquireTwiceRaceNFS(t *testing.T) {
 		cs := cs
 		t.Run(cs.name, func(t *testing.T) {
 			t.Parallel()
-			
+
 			pfix := generateLockName(t)
 
 			var wg sync.WaitGroup

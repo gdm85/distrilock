@@ -57,7 +57,7 @@ lint:
 
 errcheck:
 	@echo -n "**** Running: "
-	errcheck -ignorepkg os $(PKGS)
+	errcheck -ignoretests -exclude .errcheck-exclude.list $(PKGS)
 
 clean:
 	rm -rf bin/ docs/
