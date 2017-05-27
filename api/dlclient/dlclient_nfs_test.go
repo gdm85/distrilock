@@ -73,6 +73,13 @@ func TestAcquireAndReleaseNFS(t *testing.T) {
 	if err == nil || err.Error() != "Failed: lock not found" {
 		t.Fatal("expected lock not found failure, but got", err)
 	}
+	
+	// fix it back
+	l.c = testClientC1
+	err = l.Release()
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestAcquireTwiceNFS(t *testing.T) {
@@ -130,6 +137,26 @@ func TestAcquireRaceNFS(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode.")
 	}
+	
+	checkWithRetries := func(lockName string, maxRetries int) (int, bool, error) {
+		var err error
+		var isLocked bool
+		var retry int
+		for retry < maxRetries {
+			isLocked, err = testClientD1.IsLocked(lockName)
+			if err != nil {
+				return retry, isLocked, err
+			}
+			
+			if isLocked {
+				return retry, true, nil
+			}
+			
+			retry++
+		}
+		
+		return retry, isLocked, err
+	}
 
 	pfix := generateLockName(t)
 
@@ -145,9 +172,9 @@ func TestAcquireRaceNFS(t *testing.T) {
 				t.Error(err)
 				return
 			}
-			isLocked, err := testClientD1.IsLocked(lockName)
+			retries, isLocked, err := checkWithRetries(lockName, 15)
 			if err != nil || !isLocked {
-				t.Errorf("%s: expected no error and lock acquired, but got err=%v and isLocked=%v", lockName, err, isLocked)
+				t.Errorf("%s: expected no error and lock acquired, but got err=%v and isLocked=%v after %d retries", lockName, err, isLocked, retries)
 
 				// release resources
 				l1.Release()
@@ -158,6 +185,11 @@ func TestAcquireRaceNFS(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
+			
+			if retries != 0 {
+				t.Errorf("%s: lock check after %d retries", lockName, retries)
+			}
+			
 		}(lockName)
 	}
 
