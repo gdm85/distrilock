@@ -30,6 +30,7 @@ var (
 
 type clientSuite struct {
 	name string
+	websockets bool
 
 	testClientA1, testClientA2 client.Client
 	testClientB1               client.Client
@@ -50,33 +51,37 @@ func init() {
 
 func newClientSuite(websockets bool) *clientSuite {
 	var cs clientSuite
-	cs.name = "TCP clients suite"
-	// first server process
-	var err error
-	cs.testLocalAddr, err = net.ResolveTCPAddr("tcp", defaultServerA)
-	if err != nil {
-		panic(err)
+	cs.websockets = websockets
+	if websockets {
+		cs.name = "Websockets clients suite"
+	} else {
+		cs.name = "TCP clients suite"
 	}
-	// a second process accessing same locks
-	b, err := net.ResolveTCPAddr("tcp", defaultServerB)
-	if err != nil {
-		panic(err)
-	}
+	
+	if websockets {
+	} else {
+		// first server process
+		var err error
+		cs.testLocalAddr, err = net.ResolveTCPAddr("tcp", defaultServerA)
+		if err != nil {
+			panic(err)
+		}
 
-	// first process on NFS
-	cs.testNFSLocalAddr, err = net.ResolveTCPAddr("tcp", defaultServerC)
-	if err != nil {
-		panic(err)
-	}
-	// second process on NFS, different machine
-	cs.testNFSRemoteAddr, err = net.ResolveTCPAddr("tcp", defaultServerD)
-	if err != nil {
-		panic(err)
+		// first process on NFS
+		cs.testNFSLocalAddr, err = net.ResolveTCPAddr("tcp", defaultServerC)
+		if err != nil {
+			panic(err)
+		}
+		// second process on NFS, different machine
+		cs.testNFSRemoteAddr, err = net.ResolveTCPAddr("tcp", defaultServerD)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	cs.testClientA1 = cs.createLocalClient()
 	cs.testClientA2 = cs.createLocalClient()
-	cs.testClientB1 = createClient(b)
+	cs.testClientB1 = cs.createLocalAltClient()
 	cs.testClientC1 = cs.createSlowNFSLocalClient()
 	cs.testClientD1 = cs.createNFSRemoteClient()
 
@@ -84,16 +89,39 @@ func newClientSuite(websockets bool) *clientSuite {
 }
 
 func (cs *clientSuite) createSlowNFSLocalClient() client.Client {
+	if cs.websockets {
+		panic("WRITE ME")
+	}
 	return createSlowClient(cs.testNFSLocalAddr)
 }
 
 func (cs *clientSuite) createNFSRemoteClient() client.Client {
+	if cs.websockets {
+		panic("WRITE ME")
+	}
 	return createClient(cs.testNFSRemoteAddr)
 }
 
 func (cs *clientSuite) createLocalClient() client.Client {
+	if cs.websockets {
+		panic("WRITE ME")
+	}
 	return createClient(cs.testLocalAddr)
 }
+
+func (cs *clientSuite) createLocalAltClient() client.Client {
+	if cs.websockets {
+		panic("WRITE ME")
+	}
+		// a second process accessing same locks
+		b, err := net.ResolveTCPAddr("tcp", defaultServerB)
+		if err != nil {
+			panic(err)
+		}
+
+	return createClient(b)
+}
+
 
 func (cs *clientSuite) CloseAll() {
 	// close all clients
@@ -115,14 +143,16 @@ func createSlowClient(a *net.TCPAddr) client.Client {
 
 func TestMain(m *testing.M) {
 	tcpClientSuite = newClientSuite(false)
-	websocketClientSuite = newClientSuite(true)
+	//websocketClientSuite = newClientSuite(true)
 
-	clientSuites = []*clientSuite{tcpClientSuite, websocketClientSuite}
+	//clientSuites = []*clientSuite{tcpClientSuite, websocketClientSuite}
+	clientSuites = []*clientSuite{tcpClientSuite}
 
 	retCode := m.Run()
 
-	tcpClientSuite.CloseAll()
-	websocketClientSuite.CloseAll()
+	for _, cs := range clientSuites {
+		cs.CloseAll()
+	}
 
 	os.Exit(retCode)
 }
