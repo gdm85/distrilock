@@ -14,12 +14,13 @@ import (
 const lockExt = ".lck"
 
 var (
+	validLockNameRx    = regexp.MustCompile(`^[A-Za-z0-9.\-_]+$`)
 	knownResources     = map[string]*os.File{}
 	resourceAcquiredBy = map[*os.File]*net.TCPConn{}
 	knownResourcesLock sync.RWMutex
-	validLockNameRx    = regexp.MustCompile(`^[A-Za-z0-9.\-_]+$`)
 )
 
+// ProcessRequest will process the lock command request and return a response.
 func ProcessRequest(directory string, client *net.TCPConn, req api.LockRequest) api.LockResponse {
 	var res api.LockResponse
 	res.LockRequest = req
@@ -50,6 +51,7 @@ func ProcessRequest(directory string, client *net.TCPConn, req api.LockRequest) 
 	return res
 }
 
+// ProcessDisconnect releases sessions and resources associated to the disconnected client.
 func ProcessDisconnect(client *net.TCPConn) {
 	knownResourcesLock.Lock()
 

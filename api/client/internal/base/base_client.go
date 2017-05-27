@@ -62,7 +62,7 @@ func (c *baseClient) Acquire(lockName string) (*client.Lock, error) {
 	return nil, &client.Error{Result: res.Result, Reason: res.Reason}
 }
 
-// Release will release a locked name previously acquired.
+// Release will release a locked name previously acquired in this session.
 func (c *baseClient) Release(l *client.Lock) error {
 	if c != l.Client {
 		panic("BUG: attempting to release lock acquired via different client")

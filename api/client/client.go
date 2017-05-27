@@ -6,11 +6,17 @@ import (
 	"bitbucket.org/gdm85/go-distrilock/api"
 )
 
+// Client is a generic distrilock client interface.
 type Client interface {
+	// Acquire will acquire a named lock through the distrilock daemon.
 	Acquire(lockName string) (*Lock, error)
+	// Release will release a locked name previously acquired in this session.
 	Release(l *Lock) error
+	// IsLocked returns true when distrilock deamon estabilished that lock is currently acquired.
 	IsLocked(lockName string) (bool, error)
+	// Verify will verify that the lock is currently held by the client and healthy.
 	Verify(l *Lock) error
+	// Close releases all session-specific resources of this client.
 	Close() error
 }
 
