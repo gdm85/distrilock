@@ -13,9 +13,10 @@ import (
 )
 
 const defaultKeepAlive = time.Second * 3
+const defaultAddress = ":13123"
 
 func main() {
-	flags, err := flags.Parse(os.Args)
+	flags, err := flags.Parse(os.Args, defaultAddress)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: %v\n", err)
 		os.Exit(5)

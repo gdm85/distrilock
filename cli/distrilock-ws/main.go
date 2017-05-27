@@ -13,6 +13,7 @@ import (
 )
 
 const defaultKeepAlive = time.Second * 3
+const defaultAddress = ":13124"
 
 func main() {
 	upgrader := websocket.Upgrader{
@@ -20,7 +21,7 @@ func main() {
 		WriteBufferSize: 1024,
 	}
 
-	flags, err := flags.Parse(os.Args)
+	flags, err := flags.Parse(os.Args, defaultAddress)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: %v\n", err)
 		os.Exit(5)

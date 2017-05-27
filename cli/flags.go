@@ -9,8 +9,6 @@ import (
 	flag "github.com/ogier/pflag"
 )
 
-const defaultAddress = ":13123"
-
 type Flags struct {
 	*flag.FlagSet
 
@@ -19,7 +17,7 @@ type Flags struct {
 }
 
 // ParseFlags parses valid command-line flags for distrilock or returns an error; if help flag was selected, it exits the process.
-func Parse(args []string) (*Flags, error) {
+func Parse(args []string, defaultAddress string) (*Flags, error) {
 	if len(args) < 1 {
 		return nil, errors.New("empty arguments")
 	}
