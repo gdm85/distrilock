@@ -2,6 +2,7 @@ package dlclient
 
 import (
 	"fmt"
+	"sync"
 	"math/rand"
 	"testing"
 
@@ -125,3 +126,38 @@ func TestAcquireAfterReleaseNFS(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestAcquireRaceNFS(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+	}
+	
+	pfix := fmt.Sprintf("testing-%d", rand.Int())
+	
+	var wg sync.WaitGroup
+	for i:=0;i<1000;i++ {
+		lockName := fmt.Sprintf("%s-%d", pfix, i)
+		
+		wg.Add(1)
+		go func(lockName string) {
+			defer wg.Done()
+			l1, err := testClientC1.Acquire(lockName)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			isLocked, err := testClientD1.IsLocked(lockName)
+			if err != nil || !isLocked {
+				t.Errorf("%s: expected no error and lock acquired, but got err=%v and isLocked=%v", lockName, err, isLocked)
+				return
+			}
+			err = l1.Release()
+			if err != nil {
+				t.Error(err)
+			}
+		}(lockName)
+	}
+	
+	wg.Wait()
+}
+
