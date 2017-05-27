@@ -31,7 +31,6 @@ const (
 	Success
 	BadRequest
 	InternalError
-	Denied
 	TooBusy
 )
 
@@ -45,8 +44,6 @@ func (lcr LockCommandResult) String() string {
 		return `BadRequest`
 	case InternalError:
 		return `InternalError`
-	case Denied:
-		return `Denied`
 	case TooBusy:
 		return `TooBusy`
 	}

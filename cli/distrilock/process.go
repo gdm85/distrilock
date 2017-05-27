@@ -95,7 +95,7 @@ func release(client *net.TCPConn, lockName string) (api.LockCommandResult, strin
 		panic("BUG: missing resource acquired by record")
 	}
 	if by != client {
-		return api.Denied, "resource acquired in a different session"
+		return api.Failed, "resource acquired in a different session"
 	}
 
 	delete(knownResources, lockName)
@@ -149,7 +149,7 @@ func acquire(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 		panic("BUG: missing resource acquired by record")
 	}
 	if by != client {
-		return api.Denied, "resource acquired in a different session"
+		return api.Failed, "resource acquired in a different session"
 	}
 
 	// already acquired by self
