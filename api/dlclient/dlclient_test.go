@@ -19,6 +19,25 @@ func TestAcquireAndRelease(t *testing.T) {
 	}
 }
 
+func TestAcquireVerifyAndRelease(t *testing.T) {
+	lockName := generateLockName(t)
+
+	l, err := testClientA1.Acquire(lockName)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = l.Verify()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = l.Release()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestReleaseNonExisting(t *testing.T) {
 	lockName := generateLockName(t)
 
@@ -60,9 +79,6 @@ func TestPeekExisting(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-}
-
-func TestPeekStale(t *testing.T) {
 }
 
 func TestAcquireTwice(t *testing.T) {
@@ -145,6 +161,18 @@ func TestAcquireAndReleaseDiffProc(t *testing.T) {
 	err = l.Release()
 	if err == nil || err.Error() != "Failed: lock not found" {
 		t.Fatal("expected lock not found failure, but got", err)
+	}
+
+	err = l.Verify()
+	if err == nil || err.Error() != "Failed: lock not found" {
+		t.Fatal("expected lock not found failure, but got", err)
+	}
+
+	// restore
+	l.c = testClientA1
+	err = l.Release()
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 

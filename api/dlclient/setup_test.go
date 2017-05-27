@@ -15,6 +15,8 @@ const (
 	defaultServerB = ":63420"
 	defaultServerC = ":63421"
 	defaultServerD = "sibling:63422"
+
+	deterministicTests = true
 )
 
 var (
@@ -25,7 +27,11 @@ var (
 )
 
 func init() {
-	rand.Seed(time.Now().UTC().UnixNano())
+	if !deterministicTests {
+		rand.Seed(time.Now().UTC().UnixNano())
+	} else {
+		rand.Seed(63419)
+	}
 
 	// first server process
 	a, err := net.ResolveTCPAddr("tcp", defaultServerA)
@@ -58,6 +64,14 @@ func init() {
 
 func TestMain(m *testing.M) {
 	retCode := m.Run()
+
+	// close all clients
+	for _, c := range []*Client{testClientA1, testClientA2, testClientB1, testClientC1, testClientD1} {
+		err := c.Close()
+		if err != nil {
+			panic(err)
+		}
+	}
 
 	os.Exit(retCode)
 }

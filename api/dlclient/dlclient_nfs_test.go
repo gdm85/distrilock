@@ -73,7 +73,7 @@ func TestAcquireAndReleaseNFS(t *testing.T) {
 	if err == nil || err.Error() != "Failed: lock not found" {
 		t.Fatal("expected lock not found failure, but got", err)
 	}
-	
+
 	// fix it back
 	l.c = testClientC1
 	err = l.Release()
@@ -133,11 +133,11 @@ func TestAcquireAfterReleaseNFS(t *testing.T) {
 	}
 }
 
-func TestAcquireRaceNFS(t *testing.T) {
+func disabledTestAcquireRaceNFS(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode.")
 	}
-	
+
 	checkWithRetries := func(lockName string, maxRetries int) (int, bool, error) {
 		var err error
 		var isLocked bool
@@ -147,14 +147,14 @@ func TestAcquireRaceNFS(t *testing.T) {
 			if err != nil {
 				return retry, isLocked, err
 			}
-			
+
 			if isLocked {
 				return retry, true, nil
 			}
-			
+
 			retry++
 		}
-		
+
 		return retry, isLocked, err
 	}
 
@@ -185,11 +185,66 @@ func TestAcquireRaceNFS(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			
+
 			if retries != 0 {
 				t.Errorf("%s: lock check after %d retries", lockName, retries)
 			}
-			
+
+		}(lockName)
+	}
+
+	wg.Wait()
+}
+
+func TestAcquireTwiceRaceNFS(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+	}
+
+	pfix := generateLockName(t)
+
+	var wg sync.WaitGroup
+	for i := 0; i < 1000; i++ {
+		lockName := fmt.Sprintf("%s-%d", pfix, i)
+
+		wg.Add(1)
+		go func(lockName string) {
+			defer wg.Done()
+			l1, err := testClientC1.Acquire(lockName)
+			if err != nil {
+				t.Error("first lock acquire:", err)
+				return
+			}
+			l2, err := testClientD1.Acquire(lockName)
+			if err == nil {
+				///
+				/// somehow, two locks with the same name were retrieved
+				/// now it's time for a bit of Sherlock Holmes' investigation
+				///
+				err = l1.Verify()
+				err2 := l2.Verify()
+				t.Error("%s: lock acquired twice, verifications: %v %v", lockName, err, err2)
+
+				// at end, attempt to politely release both locks
+				err = l1.Release()
+				if err != nil {
+					t.Error("first lock release:", err)
+				}
+				err = l2.Release()
+				if err2 != nil {
+					t.Error("second lock release:", err2)
+				}
+				return
+			}
+			if err.Error() != "Failed: resource acquired by different process" {
+				t.Errorf("%s: expected Failed error but got err=%v", lockName, err)
+				return
+			}
+			err = l1.Release()
+			if err != nil {
+				t.Error("first lock release:", err)
+			}
+
 		}(lockName)
 	}
 

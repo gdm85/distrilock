@@ -24,7 +24,23 @@ const (
 	Acquire
 	// Release is the command used to request release of a named lock.
 	Release
+	// Verify is the command used to verify that a named lock has been acquired by the caller.
+	Verify
 )
+
+func (lc LockCommand) String() string {
+	switch lc {
+	case Peek:
+		return `Peek`
+	case Acquire:
+		return `Acquire`
+	case Release:
+		return `Release`
+	case Verify:
+		return `Verify`
+	}
+	return fmt.Sprintf("UNKNOWN_LOCK_COMMAND(%d)", lc)
+}
 
 const (
 	Failed LockCommandResult = iota
@@ -47,7 +63,7 @@ func (lcr LockCommandResult) String() string {
 	case TooBusy:
 		return `TooBusy`
 	}
-	return fmt.Sprintf("UNKNOWN(%d)", lcr)
+	return fmt.Sprintf("UNKNOWN_LOCK_COMMAND_RESULT(%d)", lcr)
 }
 
 type LockRequest struct {

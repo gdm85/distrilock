@@ -38,6 +38,8 @@ func processRequest(directory string, client *net.TCPConn, req api.LockRequest) 
 		res.Result, res.Reason = release(client, req.LockName, directory)
 	case api.Peek:
 		res.Result, res.Reason, res.IsLocked = peek(req.LockName, directory)
+	case api.Verify:
+		res.Result, res.Reason = verifyOwnership(client, req.LockName, directory)
 	default:
 		res.Result = api.BadRequest
 		res.Reason = "unknown command"
@@ -115,7 +117,7 @@ func acquire(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 		panic("BUG: missing resource acquired by record")
 	}
 	if by != client {
-		return api.Failed, "resource acquired in a different session"
+		return api.Failed, "resource acquired through a different session"
 	}
 
 	// already acquired by self
@@ -174,7 +176,7 @@ func release(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 		panic("BUG: missing resource acquired by record")
 	}
 	if by != client {
-		return api.Failed, "resource acquired in a different session"
+		return api.Failed, "resource acquired through a different session"
 	}
 
 	delete(knownResources, lockName)
@@ -185,5 +187,47 @@ func release(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 		return api.InternalError, err.Error()
 	}
 
+	return api.Success, ""
+}
+
+// verifyOwnership verified that specified client has acquired lock through this node.
+func verifyOwnership(client *net.TCPConn, lockName, directory string) (api.LockCommandResult, string) {
+	knownResourcesLock.Lock()
+	defer knownResourcesLock.Unlock()
+
+	f, ok := knownResources[lockName]
+	if !ok {
+		return api.Failed, "lock not found"
+	}
+
+	// check if lock was acquired by a different client
+	by, ok := resourceAcquiredBy[f]
+	if !ok {
+		panic("BUG: missing resource acquired by record")
+	}
+	if by != client {
+		return api.Failed, "resource acquired through a different session"
+	}
+
+	// lock was already acquired by self
+	// thus re-acquiring lock must succeed
+	err := acquireLockDirect(f)
+	if err != nil {
+		if e, ok := err.(syscall.Errno); ok {
+			if e == syscall.EAGAIN || e == syscall.EACCES { // to be POSIX-compliant, both errors must be checked
+				return api.Failed, "resource acquired by different process"
+			}
+		}
+
+		return api.InternalError, err.Error()
+	}
+
+	_, err = f.Write([]byte(fmt.Sprintf("%p", client)))
+	if err != nil {
+		f.Close()
+		return api.InternalError, err.Error()
+	}
+
+	// successful lock re-acquisition
 	return api.Success, ""
 }

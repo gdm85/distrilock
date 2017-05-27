@@ -149,7 +149,7 @@ func (l *Lock) Release() error {
 		return nil
 	}
 
-	return fmt.Errorf("%v: %s", res.Result, res.Reason)
+	return &ClientError{Result: res.Result, Reason: res.Reason}
 }
 
 func (c *Client) IsLocked(lockName string) (bool, error) {
@@ -190,4 +190,27 @@ func (c *Client) Close() error {
 		return err
 	}
 	return nil
+}
+
+func (l *Lock) Verify() error {
+	err := l.c.acquireConn()
+	if err != nil {
+		return err
+	}
+
+	var req api.LockRequest
+	req.VersionMajor, req.VersionMinor = api.VersionMajor, api.VersionMinor
+	req.Command = api.Verify
+	req.LockName = l.name
+
+	res, err := l.c.do(&req)
+	if err != nil {
+		return err
+	}
+
+	if res.Result == api.Success {
+		return nil
+	}
+
+	return &ClientError{Result: res.Result, Reason: res.Reason}
 }
