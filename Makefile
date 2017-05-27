@@ -1,6 +1,6 @@
 ## For usage, see README.md
 
-PKGS := ./cli/distrilock ./api ./api/dlclient
+PKGS := ./cli/distrilock ./api ./api/client/tcp
 PKG := bitbucket.org/gdm85/go-distrilock
 
 all: vendor build test
@@ -28,7 +28,7 @@ race:
 	scripts/run-tests.sh -race $(PKGS)
 
 simplify:
-	gofmt -w -s cli/distrilock/*.go api/*.go api/dlclient/*.go
+	gofmt -w -s cli/distrilock/*.go api/*.go api/client/tcp/*.go
 
 godoc: godoc-tool
 	@echo "Go documentation available at: http://localhost:8080/pkg/$(PKG)/"
