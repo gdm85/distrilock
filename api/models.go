@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// LockCommand is a lock command identifier.
+// LockCommand is a lock command that the client can request.
 type LockCommand uint8
 
 // LockCommandResult is the result of a lock command.

@@ -202,6 +202,14 @@ For an usage that is sensible to network interruptions, something like the follo
 	}
 ```
 
+## Other possible improvements
+
+* the internal map sports a `sync.RWMutex` that optimizes reads; however, read optimizations are only effective if you have a high number of collisions against the same daemon instance; an option to disable RLock could be provided for the rest of scenarios
+
+## License
+
+[GNU GPLv2](./LICENSE)
+
 ## Relevant links
 
 * [File Locking and Unlocking with Fcntl](http://voyager.deanza.edu/~perry/lock.html), a nice summary on file locking with fcntl, also [available here in markdown format](./c_examples.md)

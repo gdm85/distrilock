@@ -93,10 +93,9 @@ func shortAcquire(client *net.TCPConn, f *os.File, fullLock bool) (api.LockComma
 		return api.Failed, "resource acquired through a different session"
 	}
 
-	// already acquired by self
-	//TODO: this is a no-operation, should lock be acquired again with fcntl?
-	//		and what if the re-acquisition fails? that would perhaps qualify
-	//		as a different lock command?
+	// lock was already acquired by this session, and it must still be held by us
+	// however, note that no re-acquire check is performed here (like in Verify)
+	// the client can call Verify to force such check
 	return api.Success, "no-op"
 }
 
@@ -160,7 +159,7 @@ func peek(lockName, directory string) (api.LockCommandResult, string, bool) {
 
 	f, ok := knownResources[lockName]
 	if ok {
-		//TODO: perhaps check that file is really UNLCK?
+		// same as the no-op in acquire(), it is assumed here that lock is still held by this process
 		return api.Success, "", true
 	}
 	var err error

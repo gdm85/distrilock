@@ -15,8 +15,8 @@ func BenchmarkLocksTaking(b *testing.B) {
 
 	var benchmarks []lockTakingTest
 
+	// add a couple of benchmarks for each clients suite
 	for _, cs := range clientSuites {
-
 		benchmarks = append(benchmarks, []lockTakingTest{
 			{
 				name: cs.name + " random locks",
@@ -34,6 +34,7 @@ func BenchmarkLocksTaking(b *testing.B) {
 			},
 		}...)
 	}
+
 	for _, bm := range benchmarks {
 		b.Run(bm.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
