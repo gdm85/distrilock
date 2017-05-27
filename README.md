@@ -96,6 +96,108 @@ ok  	bitbucket.org/gdm85/go-distrilock/api/client	12.126s
 * **godoc** runs a local godoc HTTP server to explore package documentation
 * **godoc-static** will store locally in `docs/` directory the HTML files for godoc package documentation
 
+## How to use
+
+Use one of the available daemons:
+```bash
+$ bin/distrilock --help
+Usage: distrilock [--address=:13123] [--directory=.]
+$ bin/distrilock-ws --help
+Usage: distrilock [--address=:13124] [--directory=.]
+```
+
+Two deamons can point to the same directory - even across hosts, if using NFSv4 - if the operative system is POSIX compliant.
+
+### Client side
+
+Three types of clients are available:
+
+* **TCP**, only with `bin/distrilock`
+* **Websockets** with binary messages, only with `bin/distrilock-ws`
+* **Websockets** with text (JSON) messages, only with `bin/distrilock-ws`
+
+Look at the available tests for usage examples.
+
+## FAQ
+
+### How can I implement something like leases or expiration context?
+
+Don't. If connection with the daemon is interrupted, you also have to stop assuming that the lock that was being used is still granted to your client.
+For an usage that is sensible to network interruptions, something like the following can be used:
+```go
+	// resolve daemon address
+	addr, err := net.ResolveTCPAddr("tcp", ":13123")
+	if err != nil {
+		panic(err)
+	}
+	
+	// create client
+	c := tcp.New(addr, time.Second*3, time.Second*3, time.Second*3)
+	
+	// acquire lock
+	l, err := c.Acquire("my-named-lock")
+	if err != nil {
+		panic(err)
+	}
+	
+	// initialise a goroutine verifying lock at a specific interval
+	brokenLock := make(chan error)
+	done := make(chan struct{})
+	finished := make(chan struct{})
+	go func() {
+		t := time.NewTicker(time.Millisecond * 400)
+		defer t.Stop()
+		defer func() { finished <- struct{}{} }
+		tickChan := t.C
+		for {
+			select {
+				case <-done:
+					close(brokenLock)
+					return
+				case <-tickChan:
+					err := l.Verify()
+					if err != nil {
+						brokenLock <- err
+						close(brokenLock)
+						return
+					}
+			}
+		}
+     }()
+     
+     // start doing some intensive work
+     for !completed {
+		select {
+			case err := <-brokenLock:
+				// lock was broken, operations cannot continue
+				panic(err)
+			default:
+				// nothing to pick from channel, fast exit
+		}
+
+		///
+		/// ... do some heavy work here, then iterate for some more heavy work
+		///
+     }
+     
+	// stop goroutine
+	done <- struct{}{}
+	close(done)
+	<-finished
+	
+	// release lock
+	err = l.Release()
+	if err != nil {
+		panic(err)
+	}
+	
+	// close connection
+	err = c.Close()
+	if err != nil {
+		panic(err)
+	}
+```
+
 ## Relevant links
 
 * [Linux flock utlity](https://github.com/karelzak/util-linux/blob/master/sys-utils/flock.c)
