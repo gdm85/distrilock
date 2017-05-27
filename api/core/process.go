@@ -17,7 +17,7 @@ var (
 	knownResources     = map[string]*os.File{}
 	resourceAcquiredBy = map[*os.File]*net.TCPConn{}
 	knownResourcesLock sync.RWMutex
-	validLockNameRx    = regexp.MustCompile(`^[A-Za-z0-9.\-]+$`)
+	validLockNameRx    = regexp.MustCompile(`^[A-Za-z0-9.\-_]+$`)
 )
 
 func ProcessRequest(directory string, client *net.TCPConn, req api.LockRequest) api.LockResponse {

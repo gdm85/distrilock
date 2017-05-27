@@ -2,11 +2,11 @@ package client
 
 import (
 	"fmt"
-	
+
 	"bitbucket.org/gdm85/go-distrilock/api"
 )
 
-type Client interface{
+type Client interface {
 	Acquire(lockName string) (*Lock, error)
 	Release(l *Lock) error
 	IsLocked(lockName string) (bool, error)

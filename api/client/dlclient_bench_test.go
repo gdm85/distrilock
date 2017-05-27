@@ -1,27 +1,54 @@
 package client_test
 
 import (
-	"fmt"
 	"testing"
 )
 
 func BenchmarkLocksTaking(b *testing.B) {
+	type lockTakingTest struct {
+		name    string
+		nameGen func() string
+		cs      *clientSuite
+	}
+
 	fixedLockName := generateLockName(b)
-	type nameGen func() string
-	benchmarks := []nameGen{
-		func() string {
-			return generateLockName(b)
+
+	benchmarks := []lockTakingTest{
+		{
+			name: "TCP random locks",
+			nameGen: func() string {
+				return generateLockName(b)
+			},
+			cs: tcpClientSuite,
 		},
-		func() string {
-			return fixedLockName
+		{
+			name: "TCP fixed locks",
+			nameGen: func() string {
+				return fixedLockName
+			},
+			cs: tcpClientSuite,
+		},
+		{
+			name: "websocket random locks",
+			nameGen: func() string {
+				return generateLockName(b)
+			},
+			cs: websocketClientSuite,
+		},
+		{
+			name: "websocket fixed locks",
+			nameGen: func() string {
+				return fixedLockName
+			},
+			cs: websocketClientSuite,
 		},
 	}
-	for i, bm := range benchmarks {
-		b.Run(fmt.Sprintf("benchmark#%d", i), func(b *testing.B) {
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				lockName := bm()
+				lockName := bm.nameGen()
 
-				c := cs.createLocalClient()
+				c := bm.cs.createLocalClient()
 
 				l, err := c.Acquire(lockName)
 				if err != nil {

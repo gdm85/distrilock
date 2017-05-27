@@ -6,11 +6,12 @@ import (
 	"net"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
-	
-	"bitbucket.org/gdm85/go-distrilock/api/client/tcp"
+
 	"bitbucket.org/gdm85/go-distrilock/api/client"
+	"bitbucket.org/gdm85/go-distrilock/api/client/tcp"
 )
 
 const (
@@ -22,12 +23,19 @@ const (
 	deterministicTests = true
 )
 
+var (
+	tcpClientSuite, websocketClientSuite *clientSuite
+	clientSuites                         []*clientSuite
+)
+
 type clientSuite struct {
+	name string
+
 	testClientA1, testClientA2 client.Client
 	testClientB1               client.Client
 	testClientC1               client.Client
 	testClientD1               client.Client
-	
+
 	// internal
 	testLocalAddr, testNFSLocalAddr, testNFSRemoteAddr *net.TCPAddr
 }
@@ -40,8 +48,9 @@ func init() {
 	}
 }
 
-func initClientSuite(websockets bool) *clientSuite {
+func newClientSuite(websockets bool) *clientSuite {
 	var cs clientSuite
+	cs.name = "TCP clients suite"
 	// first server process
 	var err error
 	cs.testLocalAddr, err = net.ResolveTCPAddr("tcp", defaultServerA)
@@ -70,20 +79,30 @@ func initClientSuite(websockets bool) *clientSuite {
 	cs.testClientB1 = createClient(b)
 	cs.testClientC1 = cs.createSlowNFSLocalClient()
 	cs.testClientD1 = cs.createNFSRemoteClient()
-	
+
 	return &cs
 }
 
-func(cs *clientSuite) createSlowNFSLocalClient() client.Client {
+func (cs *clientSuite) createSlowNFSLocalClient() client.Client {
 	return createSlowClient(cs.testNFSLocalAddr)
 }
 
-func(cs *clientSuite) createNFSRemoteClient() client.Client {
+func (cs *clientSuite) createNFSRemoteClient() client.Client {
 	return createClient(cs.testNFSRemoteAddr)
 }
 
-func(cs *clientSuite) createLocalClient() client.Client {
+func (cs *clientSuite) createLocalClient() client.Client {
 	return createClient(cs.testLocalAddr)
+}
+
+func (cs *clientSuite) CloseAll() {
+	// close all clients
+	for _, c := range []client.Client{cs.testClientA1, cs.testClientA2, cs.testClientB1, cs.testClientC1, cs.testClientD1} {
+		err := c.Close()
+		if err != nil {
+			panic(err)
+		}
+	}
 }
 
 func createClient(a *net.TCPAddr) client.Client {
@@ -94,20 +113,16 @@ func createSlowClient(a *net.TCPAddr) client.Client {
 	return dlclient.New(a, time.Second*3, time.Second*15, time.Second*15)
 }
 
-var cs *clientSuite
-
 func TestMain(m *testing.M) {
-	cs = initClientSuite(false)
-	
+	tcpClientSuite = newClientSuite(false)
+	websocketClientSuite = newClientSuite(true)
+
+	clientSuites = []*clientSuite{tcpClientSuite, websocketClientSuite}
+
 	retCode := m.Run()
-	
-	// close all clients
-	for _, c := range []client.Client{cs.testClientA1, cs.testClientA2, cs.testClientB1, cs.testClientC1, cs.testClientD1} {
-		err := c.Close()
-		if err != nil {
-			panic(err)
-		}
-	}
+
+	tcpClientSuite.CloseAll()
+	websocketClientSuite.CloseAll()
 
 	os.Exit(retCode)
 }
@@ -124,6 +139,7 @@ func generateLockName(bOrT interface{}) string {
 		panic("BUG: passed invalid type to generateLockName")
 	}
 
-	return fmt.Sprintf("%v-%d", nameV, rand.Int())
-
+	s := fmt.Sprintf("%v-%d", nameV, rand.Int())
+	s = strings.Replace(s, "/", "-", -1)
+	return strings.Replace(s, "#", "-", -1)
 }

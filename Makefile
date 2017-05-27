@@ -28,7 +28,7 @@ race:
 	scripts/run-tests.sh -race $(PKGS)
 
 simplify:
-	gofmt -w -s cli/distrilock/*.go api/*.go api/client/tcp/*.go cli/distrilock-ws/*.go api/core/*.go cli/*.go api/*.go
+	gofmt -w -s $(shell find $(PKGS) -name '*.go' -type f)
 
 godoc: godoc-tool
 	@echo "Go documentation available at: http://localhost:8080/pkg/$(PKG)/"
