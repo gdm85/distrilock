@@ -1,4 +1,4 @@
-package api
+package client_test
 
 import (
 	"fmt"
@@ -8,6 +8,9 @@ import (
 	"reflect"
 	"testing"
 	"time"
+	
+	"bitbucket.org/gdm85/go-distrilock/api/client/tcp"
+	"bitbucket.org/gdm85/go-distrilock/api/client"
 )
 
 const (
@@ -20,10 +23,10 @@ const (
 )
 
 var (
-	testClientA1, testClientA2 *Client
-	testClientB1               *Client
-	testClientC1               *Client
-	testClientD1               *Client
+	testClientA1, testClientA2 client.Client
+	testClientB1               client.Client
+	testClientC1               client.Client
+	testClientD1               client.Client
 	testLocalAddr              *net.TCPAddr
 	testNFSLocalAddr           *net.TCPAddr
 	testNFSRemoteAddr          *net.TCPAddr
@@ -66,19 +69,19 @@ func init() {
 	testClientD1 = createClient(testNFSRemoteAddr)
 }
 
-func createClient(a *net.TCPAddr) *Client {
-	return New(a, time.Second*3, time.Second*2, time.Second*2)
+func createClient(a *net.TCPAddr) client.Client {
+	return dlclient.New(a, time.Second*3, time.Second*2, time.Second*2)
 }
 
-func createSlowClient(a *net.TCPAddr) *Client {
-	return New(a, time.Second*3, time.Second*15, time.Second*15)
+func createSlowClient(a *net.TCPAddr) client.Client {
+	return dlclient.New(a, time.Second*3, time.Second*15, time.Second*15)
 }
 
 func TestMain(m *testing.M) {
 	retCode := m.Run()
 
 	// close all clients
-	for _, c := range []*Client{testClientA1, testClientA2, testClientB1, testClientC1, testClientD1} {
+	for _, c := range []client.Client{testClientA1, testClientA2, testClientB1, testClientC1, testClientD1} {
 		err := c.Close()
 		if err != nil {
 			panic(err)

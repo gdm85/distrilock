@@ -1,11 +1,12 @@
-package api
+package client_test
 
 import (
 	"fmt"
 	"sync"
 	"testing"
-
+	
 	"bitbucket.org/gdm85/go-distrilock/api"
+	"bitbucket.org/gdm85/go-distrilock/api/client"
 )
 
 func TestAcquireContentionNFS(t *testing.T) {
@@ -23,7 +24,7 @@ func TestAcquireContentionNFS(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected failure to acquire lock already acquired from other session")
 	}
-	e, ok := err.(*ClientError)
+	e, ok := err.(*client.Error)
 	if !ok {
 		t.Fatal("expected client error, got", err)
 	}
@@ -67,7 +68,7 @@ func TestAcquireAndReleaseNFS(t *testing.T) {
 	}
 
 	// here something nasty happens
-	l.c = testClientD1
+	l.Client = testClientD1
 
 	err = l.Release()
 	if err == nil || err.Error() != "Failed: lock not found" {
@@ -75,7 +76,7 @@ func TestAcquireAndReleaseNFS(t *testing.T) {
 	}
 
 	// fix it back
-	l.c = testClientC1
+	l.Client = testClientC1
 	err = l.Release()
 	if err != nil {
 		t.Fatal(err)

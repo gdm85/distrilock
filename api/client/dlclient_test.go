@@ -1,8 +1,9 @@
-package api
+package client_test
 
 import (
 	"testing"
-
+	
+	"bitbucket.org/gdm85/go-distrilock/api/client"
 	"bitbucket.org/gdm85/go-distrilock/api"
 )
 
@@ -41,9 +42,9 @@ func TestAcquireVerifyAndRelease(t *testing.T) {
 func TestReleaseNonExisting(t *testing.T) {
 	lockName := generateLockName(t)
 
-	l := &Lock{
-		c:    testClientA1,
-		name: lockName,
+	l := &client.Lock{
+		Client:    testClientA1,
+		Name: lockName,
 	}
 
 	err := l.Release()
@@ -116,7 +117,7 @@ func TestAcquireContention(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected failure to acquire lock already acquired from other session")
 	}
-	e, ok := err.(*ClientError)
+	e, ok := err.(*client.Error)
 	if !ok {
 		t.Fatal("expected client error")
 	}
@@ -156,7 +157,7 @@ func TestAcquireAndReleaseDiffProc(t *testing.T) {
 	}
 
 	// here something nasty happens
-	l.c = testClientB1
+	l.Client = testClientB1
 
 	err = l.Release()
 	if err == nil || err.Error() != "Failed: lock not found" {
@@ -169,7 +170,7 @@ func TestAcquireAndReleaseDiffProc(t *testing.T) {
 	}
 
 	// restore
-	l.c = testClientA1
+	l.Client = testClientA1
 	err = l.Release()
 	if err != nil {
 		t.Fatal(err)
@@ -231,7 +232,7 @@ func TestAcquireContentionDiffProc(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected failure to acquire lock already acquired from other session")
 	}
-	e, ok := err.(*ClientError)
+	e, ok := err.(*client.Error)
 	if !ok {
 		t.Fatal("expected client error")
 	}
