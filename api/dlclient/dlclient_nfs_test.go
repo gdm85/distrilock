@@ -27,8 +27,8 @@ func TestAcquireContentionNFS(t *testing.T) {
 	if !ok {
 		t.Fatal("expected client error, got", err)
 	}
-	if e.Result != api.Denied {
-		t.Fatal("expected Denied error, got", e.Result)
+	if e.Result != api.Failed {
+		t.Fatal("expected Failed error, got", e.Result)
 	}
 
 	// check that lock is acquired from 2nd client's perspective
