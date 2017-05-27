@@ -21,7 +21,7 @@ func BenchmarkLocksTaking(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				lockName := bm()
 
-				c := createClient(testLocalAddr)
+				c := cs.createLocalClient()
 
 				l, err := c.Acquire(lockName)
 				if err != nil {

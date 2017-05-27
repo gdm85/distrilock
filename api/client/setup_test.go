@@ -22,15 +22,15 @@ const (
 	deterministicTests = true
 )
 
-var (
+type clientSuite struct {
 	testClientA1, testClientA2 client.Client
 	testClientB1               client.Client
 	testClientC1               client.Client
 	testClientD1               client.Client
-	testLocalAddr              *net.TCPAddr
-	testNFSLocalAddr           *net.TCPAddr
-	testNFSRemoteAddr          *net.TCPAddr
-)
+	
+	// internal
+	testLocalAddr, testNFSLocalAddr, testNFSRemoteAddr *net.TCPAddr
+}
 
 func init() {
 	if !deterministicTests {
@@ -38,10 +38,13 @@ func init() {
 	} else {
 		rand.Seed(63419)
 	}
+}
 
+func initClientSuite(websockets bool) *clientSuite {
+	var cs clientSuite
 	// first server process
 	var err error
-	testLocalAddr, err = net.ResolveTCPAddr("tcp", defaultServerA)
+	cs.testLocalAddr, err = net.ResolveTCPAddr("tcp", defaultServerA)
 	if err != nil {
 		panic(err)
 	}
@@ -52,21 +55,35 @@ func init() {
 	}
 
 	// first process on NFS
-	testNFSLocalAddr, err = net.ResolveTCPAddr("tcp", defaultServerC)
+	cs.testNFSLocalAddr, err = net.ResolveTCPAddr("tcp", defaultServerC)
 	if err != nil {
 		panic(err)
 	}
 	// second process on NFS, different machine
-	testNFSRemoteAddr, err = net.ResolveTCPAddr("tcp", defaultServerD)
+	cs.testNFSRemoteAddr, err = net.ResolveTCPAddr("tcp", defaultServerD)
 	if err != nil {
 		panic(err)
 	}
 
-	testClientA1 = createClient(testLocalAddr)
-	testClientA2 = createClient(testLocalAddr)
-	testClientB1 = createClient(b)
-	testClientC1 = createSlowClient(testNFSLocalAddr)
-	testClientD1 = createClient(testNFSRemoteAddr)
+	cs.testClientA1 = cs.createLocalClient()
+	cs.testClientA2 = cs.createLocalClient()
+	cs.testClientB1 = createClient(b)
+	cs.testClientC1 = cs.createSlowNFSLocalClient()
+	cs.testClientD1 = cs.createNFSRemoteClient()
+	
+	return &cs
+}
+
+func(cs *clientSuite) createSlowNFSLocalClient() client.Client {
+	return createSlowClient(cs.testNFSLocalAddr)
+}
+
+func(cs *clientSuite) createNFSRemoteClient() client.Client {
+	return createClient(cs.testNFSRemoteAddr)
+}
+
+func(cs *clientSuite) createLocalClient() client.Client {
+	return createClient(cs.testLocalAddr)
 }
 
 func createClient(a *net.TCPAddr) client.Client {
@@ -77,11 +94,15 @@ func createSlowClient(a *net.TCPAddr) client.Client {
 	return dlclient.New(a, time.Second*3, time.Second*15, time.Second*15)
 }
 
-func TestMain(m *testing.M) {
-	retCode := m.Run()
+var cs *clientSuite
 
+func TestMain(m *testing.M) {
+	cs = initClientSuite(false)
+	
+	retCode := m.Run()
+	
 	// close all clients
-	for _, c := range []client.Client{testClientA1, testClientA2, testClientB1, testClientC1, testClientD1} {
+	for _, c := range []client.Client{cs.testClientA1, cs.testClientA2, cs.testClientB1, cs.testClientC1, cs.testClientD1} {
 		err := c.Close()
 		if err != nil {
 			panic(err)

@@ -15,12 +15,12 @@ func TestAcquireContentionNFS(t *testing.T) {
 	}
 	lockName := generateLockName(t)
 
-	l1, err := testClientC1.Acquire(lockName)
+	l1, err := cs.testClientC1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = testClientD1.Acquire(lockName)
+	_, err = cs.testClientD1.Acquire(lockName)
 	if err == nil {
 		t.Fatal("expected failure to acquire lock already acquired from other session")
 	}
@@ -33,7 +33,7 @@ func TestAcquireContentionNFS(t *testing.T) {
 	}
 
 	// check that lock is acquired from 2nd client's perspective
-	isLocked, err := testClientD1.IsLocked(lockName)
+	isLocked, err := cs.testClientD1.IsLocked(lockName)
 	if err != nil || !isLocked {
 		t.Error("expected no error and lock acquired, but got", err, isLocked)
 		return
@@ -44,7 +44,7 @@ func TestAcquireContentionNFS(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	l2, err := testClientD1.Acquire(lockName)
+	l2, err := cs.testClientD1.Acquire(lockName)
 	if err != nil {
 		t.Fatal("expected success to acquire lock after it was released, got", err)
 	}
@@ -62,13 +62,13 @@ func TestAcquireAndReleaseNFS(t *testing.T) {
 
 	lockName := generateLockName(t)
 
-	l, err := testClientC1.Acquire(lockName)
+	l, err := cs.testClientC1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// here something nasty happens
-	l.Client = testClientD1
+	l.Client = cs.testClientD1
 
 	err = l.Release()
 	if err == nil || err.Error() != "Failed: lock not found" {
@@ -76,7 +76,7 @@ func TestAcquireAndReleaseNFS(t *testing.T) {
 	}
 
 	// fix it back
-	l.Client = testClientC1
+	l.Client = cs.testClientC1
 	err = l.Release()
 	if err != nil {
 		t.Fatal(err)
@@ -90,12 +90,12 @@ func TestAcquireTwiceNFS(t *testing.T) {
 
 	lockName := generateLockName(t)
 
-	l1, err := testClientC1.Acquire(lockName)
+	l1, err := cs.testClientC1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = testClientD1.Acquire(lockName)
+	_, err = cs.testClientD1.Acquire(lockName)
 	if err == nil || err.Error() != "Failed: resource acquired by different process" {
 		t.Fatal("expected failure, got", err)
 	}
@@ -113,7 +113,7 @@ func TestAcquireAfterReleaseNFS(t *testing.T) {
 
 	lockName := generateLockName(t)
 
-	l1, err := testClientC1.Acquire(lockName)
+	l1, err := cs.testClientC1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -123,7 +123,7 @@ func TestAcquireAfterReleaseNFS(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	l1, err = testClientD1.Acquire(lockName)
+	l1, err = cs.testClientD1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -144,7 +144,7 @@ func disabledTestAcquireRaceNFS(t *testing.T) {
 		var isLocked bool
 		var retry int
 		for retry < maxRetries {
-			isLocked, err = testClientD1.IsLocked(lockName)
+			isLocked, err = cs.testClientD1.IsLocked(lockName)
 			if err != nil {
 				return retry, isLocked, err
 			}
@@ -169,7 +169,7 @@ func disabledTestAcquireRaceNFS(t *testing.T) {
 		go func(lockName string) {
 			defer wg.Done()
 
-			c := createClient(testNFSLocalAddr)
+			c := cs.createSlowNFSLocalClient()
 			defer func() {
 				err := c.Close()
 				if err != nil {
@@ -177,7 +177,7 @@ func disabledTestAcquireRaceNFS(t *testing.T) {
 				}
 			}()
 
-			l1, err := testClientC1.Acquire(lockName)
+			l1, err := cs.testClientC1.Acquire(lockName)
 			if err != nil {
 				t.Error(err)
 				return
@@ -221,7 +221,7 @@ func TestAcquireTwiceRaceNFS(t *testing.T) {
 		go func(lockName string) {
 			defer wg.Done()
 
-			c, d := createSlowClient(testNFSLocalAddr), createClient(testNFSRemoteAddr)
+			c, d := cs.createSlowNFSLocalClient(), cs.createNFSRemoteClient()
 			defer d.Close()
 			defer c.Close()
 

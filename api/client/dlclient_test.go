@@ -10,7 +10,7 @@ import (
 func TestAcquireAndRelease(t *testing.T) {
 	lockName := generateLockName(t)
 
-	l, err := testClientA1.Acquire(lockName)
+	l, err := cs.testClientA1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -23,7 +23,7 @@ func TestAcquireAndRelease(t *testing.T) {
 func TestAcquireVerifyAndRelease(t *testing.T) {
 	lockName := generateLockName(t)
 
-	l, err := testClientA1.Acquire(lockName)
+	l, err := cs.testClientA1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -43,7 +43,7 @@ func TestReleaseNonExisting(t *testing.T) {
 	lockName := generateLockName(t)
 
 	l := &client.Lock{
-		Client:    testClientA1,
+		Client:    cs.testClientA1,
 		Name: lockName,
 	}
 
@@ -56,7 +56,7 @@ func TestReleaseNonExisting(t *testing.T) {
 func TestPeekNonExisting(t *testing.T) {
 	lockName := generateLockName(t)
 
-	isLocked, err := testClientA1.IsLocked(lockName)
+	isLocked, err := cs.testClientA1.IsLocked(lockName)
 	if err != nil || isLocked {
 		t.Error("expected no error and no lock, but got", err, isLocked)
 	}
@@ -65,12 +65,12 @@ func TestPeekNonExisting(t *testing.T) {
 func TestPeekExisting(t *testing.T) {
 	lockName := generateLockName(t)
 
-	l, err := testClientA1.Acquire(lockName)
+	l, err := cs.testClientA1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	isLocked, err := testClientA1.IsLocked(lockName)
+	isLocked, err := cs.testClientA1.IsLocked(lockName)
 	if err != nil || !isLocked {
 		t.Error("expected no error and lock acquired, but got", err, isLocked)
 		return
@@ -85,12 +85,12 @@ func TestPeekExisting(t *testing.T) {
 func TestAcquireTwice(t *testing.T) {
 	lockName := generateLockName(t)
 
-	l1, err := testClientA1.Acquire(lockName)
+	l1, err := cs.testClientA1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	l2, err := testClientA1.Acquire(lockName)
+	l2, err := cs.testClientA1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -108,12 +108,12 @@ func TestAcquireTwice(t *testing.T) {
 func TestAcquireContention(t *testing.T) {
 	lockName := generateLockName(t)
 
-	l1, err := testClientA1.Acquire(lockName)
+	l1, err := cs.testClientA1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = testClientA2.Acquire(lockName)
+	_, err = cs.testClientA2.Acquire(lockName)
 	if err == nil {
 		t.Fatal("expected failure to acquire lock already acquired from other session")
 	}
@@ -126,7 +126,7 @@ func TestAcquireContention(t *testing.T) {
 	}
 
 	// check that lock is acquired from 2nd client's perspective
-	isLocked, err := testClientA2.IsLocked(lockName)
+	isLocked, err := cs.testClientA2.IsLocked(lockName)
 	if err != nil || !isLocked {
 		t.Error("expected no error and lock acquired, but got", err, isLocked)
 		return
@@ -137,7 +137,7 @@ func TestAcquireContention(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	l2, err := testClientA2.Acquire(lockName)
+	l2, err := cs.testClientA2.Acquire(lockName)
 	if err != nil {
 		t.Fatal("expected success to acquire lock after it was released, got", err)
 	}
@@ -151,13 +151,13 @@ func TestAcquireContention(t *testing.T) {
 func TestAcquireAndReleaseDiffProc(t *testing.T) {
 	lockName := generateLockName(t)
 
-	l, err := testClientA1.Acquire(lockName)
+	l, err := cs.testClientA1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// here something nasty happens
-	l.Client = testClientB1
+	l.Client = cs.testClientB1
 
 	err = l.Release()
 	if err == nil || err.Error() != "Failed: lock not found" {
@@ -170,7 +170,7 @@ func TestAcquireAndReleaseDiffProc(t *testing.T) {
 	}
 
 	// restore
-	l.Client = testClientA1
+	l.Client = cs.testClientA1
 	err = l.Release()
 	if err != nil {
 		t.Fatal(err)
@@ -180,12 +180,12 @@ func TestAcquireAndReleaseDiffProc(t *testing.T) {
 func TestAcquireTwiceDiffProc(t *testing.T) {
 	lockName := generateLockName(t)
 
-	l1, err := testClientA1.Acquire(lockName)
+	l1, err := cs.testClientA1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = testClientB1.Acquire(lockName)
+	_, err = cs.testClientB1.Acquire(lockName)
 	if err == nil || err.Error() != "Failed: resource acquired by different process" {
 		t.Fatal("expected failure, got", err)
 	}
@@ -199,7 +199,7 @@ func TestAcquireTwiceDiffProc(t *testing.T) {
 func TestAcquireAfterDiffProcRelease(t *testing.T) {
 	lockName := generateLockName(t)
 
-	l1, err := testClientA1.Acquire(lockName)
+	l1, err := cs.testClientA1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -209,7 +209,7 @@ func TestAcquireAfterDiffProcRelease(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	l1, err = testClientB1.Acquire(lockName)
+	l1, err = cs.testClientB1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -223,12 +223,12 @@ func TestAcquireAfterDiffProcRelease(t *testing.T) {
 func TestAcquireContentionDiffProc(t *testing.T) {
 	lockName := generateLockName(t)
 
-	l1, err := testClientA1.Acquire(lockName)
+	l1, err := cs.testClientA1.Acquire(lockName)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = testClientB1.Acquire(lockName)
+	_, err = cs.testClientB1.Acquire(lockName)
 	if err == nil {
 		t.Fatal("expected failure to acquire lock already acquired from other session")
 	}
@@ -241,7 +241,7 @@ func TestAcquireContentionDiffProc(t *testing.T) {
 	}
 
 	// check that lock is acquired from 2nd client's perspective
-	isLocked, err := testClientB1.IsLocked(lockName)
+	isLocked, err := cs.testClientB1.IsLocked(lockName)
 	if err != nil || !isLocked {
 		t.Error("expected no error and lock acquired, but got", err, isLocked)
 		return
@@ -252,7 +252,7 @@ func TestAcquireContentionDiffProc(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	l2, err := testClientB1.Acquire(lockName)
+	l2, err := cs.testClientB1.Acquire(lockName)
 	if err != nil {
 		t.Fatal("expected success to acquire lock after it was released, got", err)
 	}
