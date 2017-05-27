@@ -58,7 +58,7 @@ func processDisconnect(client *net.TCPConn) {
 	// perform (inefficient) reverse lookups for deletions
 	for f, by := range resourceAcquiredBy {
 		if by == client {
-			f.Close()
+			_ = f.Close()
 			filesToDrop = append(filesToDrop, f)
 			delete(resourceAcquiredBy, f)
 		}
@@ -182,11 +182,11 @@ func peek(lockName, directory string) (api.LockCommandResult, string, bool) {
 }
 
 func release(client *net.TCPConn, lockName, directory string) (api.LockCommandResult, string) {
-	knownResourcesLock.Lock()
-	defer knownResourcesLock.Unlock()
+	knownResourcesLock.RLock()
 
 	f, ok := knownResources[lockName]
 	if !ok {
+		knownResourcesLock.RUnlock()
 		return api.Failed, "lock not found"
 	}
 
@@ -196,11 +196,31 @@ func release(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 		panic("BUG: missing resource acquired by record")
 	}
 	if by != client {
+		knownResourcesLock.RUnlock()
+		return api.Failed, "resource acquired through a different session"
+	}
+	knownResourcesLock.RUnlock()
+	knownResourcesLock.Lock()
+
+	f, ok = knownResources[lockName]
+	if !ok {
+		knownResourcesLock.Unlock()
+		return api.Failed, "lock not found"
+	}
+
+	// check if lock was acquired by a different client
+	by, ok = resourceAcquiredBy[f]
+	if !ok {
+		panic("BUG: missing resource acquired by record")
+	}
+	if by != client {
+		knownResourcesLock.Unlock()
 		return api.Failed, "resource acquired through a different session"
 	}
 
 	err := releaseLock(f)
 	if err != nil {
+		knownResourcesLock.Unlock()
 		return api.InternalError, err.Error()
 	}
 
@@ -208,6 +228,9 @@ func release(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 	delete(resourceAcquiredBy, f)
 	_ = f.Close()
 	err = os.Remove(directory + lockName + lockExt)
+
+	knownResourcesLock.Unlock()
+
 	if err != nil {
 		return api.InternalError, err.Error()
 	}
@@ -215,28 +238,46 @@ func release(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 	return api.Success, ""
 }
 
-// verifyOwnership verified that specified client has acquired lock through this node.
+// verifyOwnership verifies that specified client has acquired lock through this node.
 func verifyOwnership(client *net.TCPConn, lockName, directory string) (api.LockCommandResult, string) {
-	knownResourcesLock.Lock()
-	defer knownResourcesLock.Unlock()
+	knownResourcesLock.RLock()
 
 	f, ok := knownResources[lockName]
 	if !ok {
+		knownResourcesLock.RUnlock()
 		return api.Failed, "lock not found"
 	}
 
 	// check if lock was acquired by a different client
 	by, ok := resourceAcquiredBy[f]
+	knownResourcesLock.RUnlock()
 	if !ok {
 		panic("BUG: missing resource acquired by record")
 	}
 	if by != client {
 		return api.Failed, "resource acquired through a different session"
 	}
+	knownResourcesLock.Lock()
+	f, ok = knownResources[lockName]
+	if !ok {
+		knownResourcesLock.Unlock()
+		return api.Failed, "lock not found"
+	}
+
+	// check if lock was acquired by a different client
+	by, ok = resourceAcquiredBy[f]
+	if !ok {
+		panic("BUG: missing resource acquired by record")
+	}
+	if by != client {
+		knownResourcesLock.Unlock()
+		return api.Failed, "resource acquired through a different session"
+	}
 
 	// lock was already acquired by self
 	// thus re-acquiring lock must succeed
 	err := acquireLockDirect(f)
+	knownResourcesLock.Unlock()
 	if err != nil {
 		if e, ok := err.(syscall.Errno); ok {
 			if e == syscall.EAGAIN || e == syscall.EACCES { // to be POSIX-compliant, both errors must be checked
