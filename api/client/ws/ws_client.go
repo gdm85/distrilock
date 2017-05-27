@@ -1,3 +1,4 @@
+// Package ws provides a distrilock client over Websockets; both binary (GOP) and text (JSON) messages are supported.
 package ws
 
 import (

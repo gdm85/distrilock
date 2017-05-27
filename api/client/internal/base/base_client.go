@@ -1,3 +1,4 @@
+// Package bclient is an internal package for the common API client functionality.
 package bclient
 
 import (

@@ -1,3 +1,4 @@
+// Package client defines the distrilock client interface and associated types.
 package client
 
 import (

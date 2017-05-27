@@ -1,3 +1,4 @@
+// Package flags defines the command line interface flags for both distrilock and distrilock-ws.
 package flags
 
 import (

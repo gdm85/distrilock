@@ -120,6 +120,10 @@ Look at the available tests for usage examples.
 
 ## FAQ
 
+### Is the client concurrency-safe?
+
+No. One client corresponds to one session which corresponds to one (TCP|Websocket) connection, which is not safe to use across goroutines.
+
 ### How can I implement something like leases or expiration context?
 
 Don't. If connection with the daemon is interrupted, you also have to stop assuming that the lock that was being used is still granted to your client.
@@ -200,6 +204,7 @@ For an usage that is sensible to network interruptions, something like the follo
 
 ## Relevant links
 
+* [File Locking and Unlocking with Fcntl](http://voyager.deanza.edu/~perry/lock.html), a nice summary on file locking with fcntl, also [available here in markdown format](./c_examples.md)
 * [Linux flock utlity](https://github.com/karelzak/util-linux/blob/master/sys-utils/flock.c)
 * [Advanced Linux Programming: fcntl: Locks and Other File Operations](http://www.informit.com/articles/article.aspx?p=23618&seqNum=4)
 * [How to do distributed locking](https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html), lengthy read, but explains some common pitfalls of distributed locking implementations (and their usage)

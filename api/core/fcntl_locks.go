@@ -26,7 +26,7 @@ func isUnlocked(fi *os.File) (bool, error) {
 		return false, err
 	}
 
-	// lock could be write or read, but caller desires to know whether it is unlocked or not
+	// lock could be write or read, but caller desires only to know whether it is unlocked or not
 	return lt.Type == syscall.F_UNLCK, nil
 }
 

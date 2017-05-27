@@ -1,4 +1,6 @@
-// distrilock-ws is the command-line-interface executable to run the distrilock API over websockets.
+// This package contains the command-line-interface executable to serve the distrilock API over websockets.
+// To read its command line help, run:
+/* $ bin/distrilock --help */
 package main
 
 import (

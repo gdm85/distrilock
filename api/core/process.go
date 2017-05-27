@@ -1,3 +1,4 @@
+// Package core defines the POSIX-specific primitives to acquire, peek and release locks using fcntl and basic file opening OS capabilities.
 package core
 
 import (

@@ -1,4 +1,4 @@
-// Package api contains the basic constants and data structures for distrilock API communication.
+// Package api contains the basic constants, enums and data structures for distrilock API communication.
 package api
 
 import (

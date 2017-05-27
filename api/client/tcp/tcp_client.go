@@ -1,3 +1,4 @@
+// Package tcp provides a distrilock client over TCP.
 package tcp
 
 import (
