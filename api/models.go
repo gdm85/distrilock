@@ -43,13 +43,17 @@ func (lc LockCommand) String() string {
 }
 
 const (
+	// Failed is returned when the command failed with the specified reason.
 	Failed LockCommandResult = iota
+	// Success is returned when the command succeeded.
 	Success
+	// BadRequest is returned when the specified parameters are invalid.
 	BadRequest
+	// InternalError is returned when an unexpected internal error happened while serving the command.
 	InternalError
-	TooBusy
 )
 
+// String returns the human-readable description of the lock command result.
 func (lcr LockCommandResult) String() string {
 	switch lcr {
 	case Failed:
@@ -60,12 +64,11 @@ func (lcr LockCommandResult) String() string {
 		return `BadRequest`
 	case InternalError:
 		return `InternalError`
-	case TooBusy:
-		return `TooBusy`
 	}
 	return fmt.Sprintf("UNKNOWN_LOCK_COMMAND_RESULT(%d)", lcr)
 }
 
+// LockRequest is a lock command request descriptor.
 type LockRequest struct {
 	VersionMajor uint8
 	VersionMinor uint8
@@ -73,9 +76,12 @@ type LockRequest struct {
 	LockName     string
 }
 
+// LockResponse is a response to a LockRequest; it always embeds the request's command and lock name.
 type LockResponse struct {
 	LockRequest
 	Result   LockCommandResult
+	// Reason is the extra human-readable text provided in case of failure, errors, success.
 	Reason   string
-	IsLocked bool // peeked information
+	// IsLocked is specified when peeking lock status.
+	IsLocked bool
 }

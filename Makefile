@@ -5,6 +5,9 @@ PKG := bitbucket.org/gdm85/go-distrilock
 
 all: vendor build test
 
+setup: vendor godoc-tool codeqa-tools
+	@echo "Setup completed"
+
 vendor:
 	if ! ls vendor/github.com/ogier/pflag/* 2>/dev/null >/dev/null; then git submodule update --init --recursive; fi
 
@@ -59,4 +62,4 @@ errcheck:
 clean:
 	rm -rf bin/ docs/
 
-.PHONY: all build test clean godoc errcheck codeqa codeqa-tools vet lint godoc-tool godoc-static vendor benchmark race
+.PHONY: all build test clean godoc errcheck codeqa codeqa-tools vet lint godoc-tool godoc-static vendor benchmark race setup

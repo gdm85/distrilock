@@ -9,6 +9,7 @@ import (
 	"bitbucket.org/gdm85/go-distrilock/api"
 )
 
+// Client is a single-connection, non-concurrency-safe client to a distrilock daemon.
 type Client struct {
 	endpoint                             *net.TCPAddr
 	keepAlive, readTimeout, writeTimeout time.Duration
@@ -20,20 +21,34 @@ type Client struct {
 	locks map[*Lock]struct{}
 }
 
+// String returns a summary of the client connection and active locks.
+func (c *Client) String() string {
+	return fmt.Sprintf("%v with %d locks", c.conn, len(c.locks))
+}
+
+// ClientError is the composite error return by all client method calls.
 type ClientError struct {
 	Result api.LockCommandResult
 	Reason string
 }
 
+// Error returns the associated summary of the ClientError e.
 func (e *ClientError) Error() string {
 	return fmt.Sprintf("%v: %s", e.Result, e.Reason)
 }
 
+// Lock is a client-specific acquired lock object.
 type Lock struct {
 	c    *Client
 	name string
 }
 
+// String returns the lock name and the associated client.
+func (l *Lock) String() string {
+	return fmt.Sprintf("%s on %v", l.name, l.c)
+}
+
+// New returns a new distrilock client; no connection is performed.
 func New(endpoint *net.TCPAddr, keepAlive, readTimeout, writeTimeout time.Duration) *Client {
 	return &Client{
 		endpoint:     endpoint,
@@ -44,6 +59,7 @@ func New(endpoint *net.TCPAddr, keepAlive, readTimeout, writeTimeout time.Durati
 	}
 }
 
+// acquireConn is called every time a connection would be necessary; it does nothing if connection has already been made. It will re-estabilish a connection if Client c had been closed before.
 func (c *Client) acquireConn() error {
 	if c.conn == nil {
 		var err error
@@ -68,6 +84,7 @@ func (c *Client) acquireConn() error {
 	return nil
 }
 
+// Acquire will acquire a named lock through the distrilock daemon.
 func (c *Client) Acquire(lockName string) (*Lock, error) {
 	err := c.acquireConn()
 	if err != nil {
@@ -99,6 +116,7 @@ func (c *Client) Acquire(lockName string) (*Lock, error) {
 	return nil, &ClientError{Result: res.Result, Reason: res.Reason}
 }
 
+// do is the function called to process a request on the wire and return the result.
 func (c *Client) do(req *api.LockRequest) (*api.LockResponse, error) {
 	if c.writeTimeout != 0 {
 		err := c.conn.SetWriteDeadline(time.Now().Add(c.writeTimeout))
@@ -128,6 +146,7 @@ func (c *Client) do(req *api.LockRequest) (*api.LockResponse, error) {
 	return &res, nil
 }
 
+// Release will release a locked name previously acquired.
 func (l *Lock) Release() error {
 	err := l.c.acquireConn()
 	if err != nil {
@@ -152,6 +171,7 @@ func (l *Lock) Release() error {
 	return &ClientError{Result: res.Result, Reason: res.Reason}
 }
 
+// IsLocked returns true when distrilock deamon estabilished that lock is currently acquired.
 func (c *Client) IsLocked(lockName string) (bool, error) {
 	err := c.acquireConn()
 	if err != nil {
@@ -175,6 +195,7 @@ func (c *Client) IsLocked(lockName string) (bool, error) {
 	return false, &ClientError{Result: res.Result, Reason: res.Reason}
 }
 
+// Close will release all active locks and close the connection.
 func (c *Client) Close() error {
 	if c.conn != nil {
 		// explicitly release all locks
@@ -192,6 +213,7 @@ func (c *Client) Close() error {
 	return nil
 }
 
+// Verify will verify that the lock is currently held by the client and healthy.
 func (l *Lock) Verify() error {
 	err := l.c.acquireConn()
 	if err != nil {
