@@ -7,19 +7,23 @@ import (
 	"os"
 	"time"
 
-	//"bitbucket.org/gdm85/go-distrilock/api/client/ws"
+	"bitbucket.org/gdm85/go-distrilock/cli"
 
 	"github.com/gorilla/websocket"
 )
 
 const defaultKeepAlive = time.Second * 3
-const address = `:8080`
-const directory = `./`
 
 func main() {
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
+	}
+
+	flags, err := flags.Parse(os.Args)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: %v\n", err)
+		os.Exit(5)
 	}
 
 	http.HandleFunc("/distrilock", func(w http.ResponseWriter, r *http.Request) {
@@ -30,11 +34,11 @@ func main() {
 			return
 		}
 
-		handleRequests(directory, conn, defaultKeepAlive)
+		handleRequests(flags.Directory, conn, defaultKeepAlive)
 	})
 
-	fmt.Printf("distrilock-ws: listening at address %s\n", address)
-	err := http.ListenAndServe(address, nil)
+	fmt.Println("distrilock-ws: listening on", flags.Address)
+	err = http.ListenAndServe(flags.Address, nil)
 	if err != nil {
 		fmt.Println("error listening:", err)
 		os.Exit(1)

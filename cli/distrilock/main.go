@@ -8,26 +8,35 @@ import (
 	"net"
 	"os"
 	"time"
+
+	"bitbucket.org/gdm85/go-distrilock/cli"
 )
 
 const defaultKeepAlive = time.Second * 3
 
 func main() {
-	flags, err := mustParseFlags(os.Args)
+	flags, err := flags.Parse(os.Args)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: %v\n", err)
+		os.Exit(5)
+	}
+
+	// validate address
+	addr, err := net.ResolveTCPAddr("tcp", flags.Address)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: %v\n", err)
 		os.Exit(5)
 	}
 
 	// Listen for incoming connections.
-	l, err := net.ListenTCP("tcp", flags.a)
+	l, err := net.ListenTCP("tcp", addr)
 	if err != nil {
 		fmt.Println("distrilock: error listening:", err.Error())
 		os.Exit(1)
 	}
 	// Close the listener when the application closes.
 	defer l.Close()
-	fmt.Println("distrilock: listening on", flags.a)
+	fmt.Println("distrilock: listening on", addr)
 	for {
 		// Listen for an incoming connection.
 		conn, err := l.AcceptTCP()

@@ -1,9 +1,8 @@
-package main
+package flags
 
 import (
 	"errors"
 	"fmt"
-	"net"
 	"os"
 	"path/filepath"
 
@@ -12,22 +11,19 @@ import (
 
 const defaultAddress = ":13123"
 
-type flags struct {
+type Flags struct {
 	*flag.FlagSet
 
 	Address   string
 	Directory string
-
-	// some parsed options
-	a *net.TCPAddr
 }
 
-// mustParseFlags parses valid command-line flags for distrilock or returns an error; if help flag was selected, it exits the process.
-func mustParseFlags(args []string) (*flags, error) {
+// ParseFlags parses valid command-line flags for distrilock or returns an error; if help flag was selected, it exits the process.
+func Parse(args []string) (*Flags, error) {
 	if len(args) < 1 {
 		return nil, errors.New("empty arguments")
 	}
-	var f flags
+	var f Flags
 	f.FlagSet = flag.NewFlagSet(args[0], flag.ExitOnError)
 
 	f.FlagSet.StringVarP(&f.Address, "address", "a", defaultAddress, "address to listen on")
@@ -44,12 +40,6 @@ func mustParseFlags(args []string) (*flags, error) {
 
 	if len(f.FlagSet.Args()) != 0 {
 		return nil, errors.New("unknown extra command line arguments specified")
-	}
-
-	// validate address
-	f.a, err = net.ResolveTCPAddr("tcp", f.Address)
-	if err != nil {
-		return nil, err
 	}
 
 	// validate directory
