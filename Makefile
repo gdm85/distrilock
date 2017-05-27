@@ -19,7 +19,7 @@ run: build
 	bin/distrilock
 
 test:
-	scripts/run-tests.sh $(PKGS)
+	scripts/run-tests.sh $(PKGS) $(TEST_OPTS)
 
 benchmark:
 	scripts/run-tests.sh -bench=. -benchtime=1s $(PKGS)

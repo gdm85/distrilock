@@ -44,8 +44,14 @@ Loop:
 	for {
 		messageType, r, err := wsconn.NextReader()
 		if err != nil {
+			_, ok := err.(*websocket.CloseError)
+			if ok {
+				// other end interrupted connection
+				break
+			}
 			fmt.Fprintf(os.Stderr, "error getting next reader: %v\n", err)
-			continue
+			wsconn.Close()
+			return
 		}
 
 		var req api.LockRequest
@@ -55,10 +61,6 @@ Loop:
 			d := gob.NewDecoder(r)
 			err = d.Decode(&req)
 			if err != nil {
-				if err == io.EOF {
-					// other end interrupted connection
-					break Loop
-				}
 				fmt.Fprintf(os.Stderr, "error decoding binary message: %v\n", err)
 				continue
 			}
@@ -66,10 +68,6 @@ Loop:
 			d := json.NewDecoder(r)
 			err = d.Decode(&req)
 			if err != nil {
-				if err == io.EOF {
-					// other end interrupted connection
-					break Loop
-				}
 				fmt.Fprintf(os.Stderr, "error decoding JSON message: %v\n", err)
 				continue
 			}
@@ -99,7 +97,8 @@ Loop:
 			err = e.Encode(&res)
 			w.Close()
 			if err != nil {
-				if err == io.EOF {
+				_, ok := err.(*websocket.CloseError)
+				if ok {
 					// other end interrupted connection
 					break Loop
 				}

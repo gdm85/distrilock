@@ -2,6 +2,7 @@ package ws
 
 import (
 	"encoding/gob"
+	"encoding/json"
 	"fmt"
 	"net"
 	"time"
@@ -95,7 +96,8 @@ func (c *websocketClient) Do(req *api.LockRequest) (*api.LockResponse, error) {
 		e := gob.NewEncoder(w)
 		err = e.Encode(&req)
 	} else {
-		panic("WRITE ME")
+		e := json.NewEncoder(w)
+		err = e.Encode(&req)
 	}
 	w.Close()
 	if err != nil {
@@ -122,7 +124,8 @@ func (c *websocketClient) Do(req *api.LockRequest) (*api.LockResponse, error) {
 		d := gob.NewDecoder(r)
 		err = d.Decode(&res)
 	} else {
-		panic("WRITE ME")
+		d := json.NewDecoder(r)
+		err = d.Decode(&res)
 	}
 	if err != nil {
 		return nil, err

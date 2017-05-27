@@ -32,8 +32,7 @@ const (
 )
 
 var (
-	tcpClientSuite, websocketClientSuite *clientSuite
-	clientSuites                         []*clientSuite
+	clientSuites []*clientSuite
 )
 
 type clientSuite struct {
@@ -163,10 +162,7 @@ func (cs *clientSuite) CloseAll() {
 }
 
 func TestMain(m *testing.M) {
-	tcpClientSuite = newClientSuite(0)
-	websocketClientSuite = newClientSuite(websocket.BinaryMessage)
-
-	clientSuites = []*clientSuite{tcpClientSuite, websocketClientSuite}
+	clientSuites = []*clientSuite{newClientSuite(0), newClientSuite(websocket.BinaryMessage), newClientSuite(websocket.TextMessage)}
 
 	retCode := m.Run()
 

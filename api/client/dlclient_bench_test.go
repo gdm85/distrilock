@@ -13,35 +13,26 @@ func BenchmarkLocksTaking(b *testing.B) {
 
 	fixedLockName := generateLockName(b)
 
-	benchmarks := []lockTakingTest{
-		{
-			name: "TCP random locks",
-			nameGen: func() string {
-				return generateLockName(b)
+	var benchmarks []lockTakingTest
+
+	for _, cs := range clientSuites {
+
+		benchmarks = append(benchmarks, []lockTakingTest{
+			{
+				name: cs.name + " random locks",
+				nameGen: func() string {
+					return generateLockName(b)
+				},
+				cs: cs,
 			},
-			cs: tcpClientSuite,
-		},
-		{
-			name: "TCP fixed locks",
-			nameGen: func() string {
-				return fixedLockName
+			{
+				name: cs.name + " fixed locks",
+				nameGen: func() string {
+					return fixedLockName
+				},
+				cs: cs,
 			},
-			cs: tcpClientSuite,
-		},
-		{
-			name: "websocket random locks",
-			nameGen: func() string {
-				return generateLockName(b)
-			},
-			cs: websocketClientSuite,
-		},
-		{
-			name: "websocket fixed locks",
-			nameGen: func() string {
-				return fixedLockName
-			},
-			cs: websocketClientSuite,
-		},
+		}...)
 	}
 	for _, bm := range benchmarks {
 		b.Run(bm.name, func(b *testing.B) {
