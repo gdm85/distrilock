@@ -50,7 +50,7 @@ Loop:
 				break
 			}
 			fmt.Fprintf(os.Stderr, "error getting next reader: %v\n", err)
-			wsconn.Close()
+			_ = wsconn.Close()
 			return
 		}
 
@@ -95,7 +95,7 @@ Loop:
 			e := gob.NewEncoder(w)
 
 			err = e.Encode(&res)
-			w.Close()
+			_ = w.Close()
 			if err != nil {
 				_, ok := err.(*websocket.CloseError)
 				if ok {
@@ -109,7 +109,7 @@ Loop:
 			e := json.NewEncoder(w)
 
 			err = e.Encode(&res)
-			w.Close()
+			_ = w.Close()
 			if err != nil {
 				if err == io.EOF {
 					// other end interrupted connection
@@ -122,7 +122,7 @@ Loop:
 	}
 
 	// Close the connection when you're done with it.
-	wsconn.Close()
+	_ = wsconn.Close()
 	//fmt.Println("a client disconnected")
 
 	core.ProcessDisconnect(conn)

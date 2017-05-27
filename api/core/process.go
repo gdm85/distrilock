@@ -125,7 +125,7 @@ func acquire(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 
 	err = acquireLockDirect(f)
 	if err != nil {
-		f.Close()
+		_ = f.Close()
 		knownResourcesLock.Unlock()
 
 		if e, ok := err.(syscall.Errno); ok {
@@ -139,7 +139,7 @@ func acquire(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 
 	_, err = f.Write([]byte(fmt.Sprintf("locked by %v", client.RemoteAddr())))
 	if err != nil {
-		f.Close()
+		_ = f.Close()
 		knownResourcesLock.Unlock()
 
 		return api.InternalError, err.Error()

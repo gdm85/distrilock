@@ -59,7 +59,7 @@ func handleRequests(directory string, conn *net.TCPConn, keepAlivePeriod time.Du
 		}
 	}
 
-	conn.Close()
+	_ = conn.Close()
 	//fmt.Println("a client disconnected")
 
 	core.ProcessDisconnect(conn)

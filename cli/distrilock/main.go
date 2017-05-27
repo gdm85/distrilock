@@ -35,8 +35,6 @@ func main() {
 		fmt.Println("distrilock: error listening:", err.Error())
 		os.Exit(1)
 	}
-	// Close the listener when the application closes.
-	defer l.Close()
 	fmt.Println("distrilock: listening on", addr)
 	for {
 		// Listen for an incoming connection.
