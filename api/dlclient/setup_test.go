@@ -24,6 +24,9 @@ var (
 	testClientB1               *Client
 	testClientC1               *Client
 	testClientD1               *Client
+	testLocalAddr              *net.TCPAddr
+	testNFSLocalAddr           *net.TCPAddr
+	testNFSRemoteAddr          *net.TCPAddr
 )
 
 func init() {
@@ -34,7 +37,8 @@ func init() {
 	}
 
 	// first server process
-	a, err := net.ResolveTCPAddr("tcp", defaultServerA)
+	var err error
+	testLocalAddr, err = net.ResolveTCPAddr("tcp", defaultServerA)
 	if err != nil {
 		panic(err)
 	}
@@ -45,21 +49,29 @@ func init() {
 	}
 
 	// first process on NFS
-	c, err := net.ResolveTCPAddr("tcp", defaultServerC)
+	testNFSLocalAddr, err = net.ResolveTCPAddr("tcp", defaultServerC)
 	if err != nil {
 		panic(err)
 	}
 	// second process on NFS, different machine
-	d, err := net.ResolveTCPAddr("tcp", defaultServerD)
+	testNFSRemoteAddr, err = net.ResolveTCPAddr("tcp", defaultServerD)
 	if err != nil {
 		panic(err)
 	}
 
-	testClientA1 = New(a, time.Second*3, time.Second*2, time.Second*2)
-	testClientA2 = New(a, time.Second*3, time.Second*2, time.Second*2)
-	testClientB1 = New(b, time.Second*3, time.Second*2, time.Second*2)
-	testClientC1 = New(c, time.Second*3, time.Second*15, time.Second*15)
-	testClientD1 = New(d, time.Second*3, time.Second*2, time.Second*2)
+	testClientA1 = createClient(testLocalAddr)
+	testClientA2 = createClient(testLocalAddr)
+	testClientB1 = createClient(b)
+	testClientC1 = createSlowClient(testNFSLocalAddr)
+	testClientD1 = createClient(testNFSRemoteAddr)
+}
+
+func createClient(a *net.TCPAddr) *Client {
+	return New(a, time.Second*3, time.Second*2, time.Second*2)
+}
+
+func createSlowClient(a *net.TCPAddr) *Client {
+	return New(a, time.Second*3, time.Second*30, time.Second*15)
 }
 
 func TestMain(m *testing.M) {

@@ -167,6 +167,15 @@ func disabledTestAcquireRaceNFS(t *testing.T) {
 		wg.Add(1)
 		go func(lockName string) {
 			defer wg.Done()
+
+			c := createClient(testNFSLocalAddr)
+			defer func() {
+				err := c.Close()
+				if err != nil {
+					t.Error(err)
+				}
+			}()
+
 			l1, err := testClientC1.Acquire(lockName)
 			if err != nil {
 				t.Error(err)
@@ -210,12 +219,23 @@ func TestAcquireTwiceRaceNFS(t *testing.T) {
 		wg.Add(1)
 		go func(lockName string) {
 			defer wg.Done()
-			l1, err := testClientC1.Acquire(lockName)
+
+			c, d := createSlowClient(testNFSLocalAddr), createClient(testNFSRemoteAddr)
+			defer d.Close()
+			defer c.Close()
+
+			l1, err := c.Acquire(lockName)
 			if err != nil {
 				t.Error("first lock acquire:", err)
 				return
 			}
-			l2, err := testClientD1.Acquire(lockName)
+			err = l1.Verify()
+			if err != nil {
+				t.Error("first lock verify:", err)
+				return
+			}
+
+			l2, err := d.Acquire(lockName)
 			if err == nil {
 				///
 				/// somehow, two locks with the same name were retrieved
@@ -223,7 +243,7 @@ func TestAcquireTwiceRaceNFS(t *testing.T) {
 				///
 				err = l1.Verify()
 				err2 := l2.Verify()
-				t.Error("%s: lock acquired twice, verifications: %v %v", lockName, err, err2)
+				t.Errorf("%s: lock acquired twice, verifications: %v %v", lockName, err, err2)
 
 				// at end, attempt to politely release both locks
 				err = l1.Release()

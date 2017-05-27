@@ -22,7 +22,7 @@ func handleRequest(directory string, conn *net.TCPConn) {
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Println("a client connected")
+	//fmt.Println("a client connected")
 
 	d := gob.NewDecoder(conn)
 	e := gob.NewEncoder(conn)
@@ -59,7 +59,7 @@ func handleRequest(directory string, conn *net.TCPConn) {
 	}
 	// Close the connection when you're done with it.
 	conn.Close()
-	fmt.Println("a client disconnected")
+	//fmt.Println("a client disconnected")
 
 	processDisconnect(conn)
 }
