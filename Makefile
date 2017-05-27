@@ -45,12 +45,15 @@ codeqa-tools:
 codeqa: vet lint errcheck
 
 vet:
-	go vet $(PKGS)
+	@echo -n "**** Running: "
+	go vet $(PKGS) || true
 
 lint:
+	@echo -n "**** Running: "
 	golint $(PKGS)
 
 errcheck:
+	@echo -n "**** Running: "
 	errcheck -ignorepkg os $(PKGS)
 
 clean:
