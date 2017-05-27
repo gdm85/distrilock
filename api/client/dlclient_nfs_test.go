@@ -13,12 +13,14 @@ func TestAcquireContentionNFS(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode.")
 	}
-	lockName := generateLockName(t)
 
 	for _, cs := range clientSuites {
 		cs := cs
 		t.Run(cs.name, func(t *testing.T) {
 			t.Parallel()
+			
+			lockName := generateLockName(t)
+			
 			l1, err := cs.testClientC1.Acquire(lockName)
 			if err != nil {
 				t.Error(err)
@@ -72,12 +74,12 @@ func TestAcquireAndReleaseNFS(t *testing.T) {
 		t.Skip("skipping test in short mode.")
 	}
 
-	lockName := generateLockName(t)
-
 	for _, cs := range clientSuites {
 		cs := cs
 		t.Run(cs.name, func(t *testing.T) {
 			t.Parallel()
+			
+			lockName := generateLockName(t)
 
 			l, err := cs.testClientC1.Acquire(lockName)
 			if err != nil {
@@ -109,12 +111,12 @@ func TestAcquireTwiceNFS(t *testing.T) {
 		t.Skip("skipping test in short mode.")
 	}
 
-	lockName := generateLockName(t)
-
 	for _, cs := range clientSuites {
 		cs := cs
 		t.Run(cs.name, func(t *testing.T) {
 			t.Parallel()
+			
+			lockName := generateLockName(t)
 
 			l1, err := cs.testClientC1.Acquire(lockName)
 			if err != nil {
@@ -142,12 +144,12 @@ func TestAcquireAfterReleaseNFS(t *testing.T) {
 		t.Skip("skipping test in short mode.")
 	}
 
-	lockName := generateLockName(t)
-
 	for _, cs := range clientSuites {
 		cs := cs
 		t.Run(cs.name, func(t *testing.T) {
 			t.Parallel()
+			
+			lockName := generateLockName(t)
 
 			l1, err := cs.testClientC1.Acquire(lockName)
 			if err != nil {
@@ -201,12 +203,12 @@ func disabledTestAcquireRaceNFS(t *testing.T) {
 		return retry, isLocked, err
 	}
 
-	pfix := generateLockName(t)
-
 	for _, cs := range clientSuites {
 		cs := cs
 		t.Run(cs.name, func(t *testing.T) {
 			t.Parallel()
+			
+			pfix := generateLockName(t)
 
 			var wg sync.WaitGroup
 			for i := 0; i < 500; i++ {
@@ -261,15 +263,15 @@ func TestAcquireTwiceRaceNFS(t *testing.T) {
 		t.Skip("skipping test in short mode.")
 	}
 
-	pfix := generateLockName(t)
-
 	for _, cs := range clientSuites {
 		cs := cs
 		t.Run(cs.name, func(t *testing.T) {
 			t.Parallel()
+			
+			pfix := generateLockName(t)
 
 			var wg sync.WaitGroup
-			for i := 0; i < 1100; i++ {
+			for i := 0; i < 1000; i++ {
 				lockName := fmt.Sprintf("%s-%d", pfix, i)
 
 				wg.Add(1)
@@ -320,7 +322,6 @@ func TestAcquireTwiceRaceNFS(t *testing.T) {
 					if err != nil {
 						t.Error("first lock release:", err)
 					}
-
 				}(lockName)
 			}
 

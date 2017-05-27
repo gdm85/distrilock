@@ -154,10 +154,7 @@ func createTCPSlowClient(a *net.TCPAddr) client.Client {
 func (cs *clientSuite) CloseAll() {
 	// close all clients
 	for _, c := range []client.Client{cs.testClientA1, cs.testClientA2, cs.testClientB1, cs.testClientC1, cs.testClientD1} {
-		err := c.Close()
-		if err != nil {
-			panic(err)
-		}
+		_ = c.Close()
 	}
 }
 
