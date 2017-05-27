@@ -1,4 +1,4 @@
-package dlclientws
+package ws
 
 import (
 	"encoding/gob"
@@ -13,8 +13,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// WebsocketClient is a single-connection, non-concurrency-safe client to a distrilock websocket daemon in binary or JSON mode.
-type WebsocketClient struct {
+// websocketClient is a single-connection, non-concurrency-safe client to a distrilock websocket daemon in binary or JSON mode.
+type websocketClient struct {
 	endpoint                  string
 	keepAlive                 time.Duration
 	readTimeout, writeTimeout time.Duration
@@ -23,13 +23,13 @@ type WebsocketClient struct {
 }
 
 // String returns a summary of the client connection and active locks.
-func (c *WebsocketClient) String() string {
+func (c *websocketClient) String() string {
 	return fmt.Sprintf("%v", c.conn)
 }
 
 // NewBinary returns a new binary distrilock websocket client; no connection is performed.
 func NewBinary(endpoint string, keepAlive, readTimeout, writeTimeout time.Duration) client.Client {
-	return bclient.New(&WebsocketClient{
+	return bclient.New(&websocketClient{
 		endpoint:     endpoint,
 		readTimeout:  readTimeout,
 		writeTimeout: writeTimeout,
@@ -40,7 +40,7 @@ func NewBinary(endpoint string, keepAlive, readTimeout, writeTimeout time.Durati
 
 // NewJSON returns a new JSON distrilock websocket client; no connection is performed.
 func NewJSON(endpoint string, keepAlive, readTimeout, writeTimeout time.Duration) client.Client {
-	return bclient.New(&WebsocketClient{
+	return bclient.New(&websocketClient{
 		endpoint:     endpoint,
 		keepAlive:    keepAlive,
 		readTimeout:  readTimeout,
@@ -50,7 +50,7 @@ func NewJSON(endpoint string, keepAlive, readTimeout, writeTimeout time.Duration
 }
 
 // acquireConn is called every time a connection would be necessary; it does nothing if connection has already been made. It will re-estabilish a connection if Client c had been closed before.
-func (c *WebsocketClient) AcquireConn() error {
+func (c *websocketClient) AcquireConn() error {
 	if c.conn == nil {
 		var err error
 		c.conn, _, err = websocket.DefaultDialer.Dial(c.endpoint, nil)
@@ -78,7 +78,7 @@ func (c *WebsocketClient) AcquireConn() error {
 	return nil
 }
 
-func (c *WebsocketClient) Do(req *api.LockRequest) (*api.LockResponse, error) {
+func (c *websocketClient) Do(req *api.LockRequest) (*api.LockResponse, error) {
 	if c.writeTimeout != 0 {
 		err := c.conn.SetWriteDeadline(time.Now().Add(c.writeTimeout))
 		if err != nil {
@@ -91,8 +91,12 @@ func (c *WebsocketClient) Do(req *api.LockRequest) (*api.LockResponse, error) {
 		return nil, err
 	}
 
-	e := gob.NewEncoder(w)
-	err = e.Encode(&req)
+	if c.messageType == websocket.BinaryMessage {
+		e := gob.NewEncoder(w)
+		err = e.Encode(&req)
+	} else {
+		panic("WRITE ME")
+	}
 	w.Close()
 	if err != nil {
 		return nil, err
@@ -114,8 +118,12 @@ func (c *WebsocketClient) Do(req *api.LockRequest) (*api.LockResponse, error) {
 	if messageType != c.messageType {
 		return nil, fmt.Errorf("got message type %s but %s expected", messageType, c.messageType)
 	}
-	d := gob.NewDecoder(r)
-	err = d.Decode(&res)
+	if c.messageType == websocket.BinaryMessage {
+		d := gob.NewDecoder(r)
+		err = d.Decode(&res)
+	} else {
+		panic("WRITE ME")
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +131,7 @@ func (c *WebsocketClient) Do(req *api.LockRequest) (*api.LockResponse, error) {
 	return &res, nil
 }
 
-func (c *WebsocketClient) Close() error {
+func (c *websocketClient) Close() error {
 	if c.conn == nil {
 		return nil
 	}
