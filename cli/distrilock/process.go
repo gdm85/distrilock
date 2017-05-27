@@ -46,64 +46,30 @@ func processRequest(directory string, client *net.TCPConn, req api.LockRequest) 
 	return res
 }
 
-func peek(lockName, directory string) (api.LockCommandResult, string, bool) {
-	knownResourcesLock.Lock()
-	defer knownResourcesLock.Unlock()
 
-	f, ok := knownResources[lockName]
-	if ok {
-		//TODO: perhaps check that file is really UNLCK?
-		return api.Success, "", true
+func processDisconnect(client *net.TCPConn) {
+	knownResourcesLock.Lock()
+
+	var filesToDrop []*os.File
+
+	// perform (inefficient) reverse lookups for deletions
+	for f, by := range resourceAcquiredBy {
+		if by == client {
+			f.Close()
+			filesToDrop = append(filesToDrop, f)
+			delete(resourceAcquiredBy, f)
+		}
 	}
-	var err error
-	// differently from acquire(), file must exist here
-	f, err = os.OpenFile(directory+lockName, os.O_RDWR, 0664)
-	if err != nil {
-		if e, ok := err.(*os.PathError); ok {
-			if e.Err == syscall.ENOENT {
-				return api.Success, "", false
+	for _, droppedF := range filesToDrop {
+		for name, f := range knownResources {
+			if f == droppedF {
+				delete(knownResources, name)
+				break
 			}
 		}
-		return api.InternalError, err.Error(), false
 	}
 
-	isUnlocked, err := isUnlocked(f)
-	f.Close()
-	if err != nil {
-		return api.InternalError, err.Error(), false
-	}
-
-	return api.Success, "", !isUnlocked
-}
-
-func release(client *net.TCPConn, lockName, directory string) (api.LockCommandResult, string) {
-	knownResourcesLock.Lock()
-	defer knownResourcesLock.Unlock()
-
-	f, ok := knownResources[lockName]
-	if !ok {
-		return api.Failed, "lock not found"
-	}
-	err := releaseLock(f)
-	if err != nil {
-		return api.InternalError, err.Error()
-	}
-
-	// check if lock was acquired by a different client
-	by, ok := resourceAcquiredBy[f]
-	if !ok {
-		panic("BUG: missing resource acquired by record")
-	}
-	if by != client {
-		return api.Failed, "resource acquired in a different session"
-	}
-
-	delete(knownResources, lockName)
-	delete(resourceAcquiredBy, f)
-	_ = f.Close()
-	_ = os.Remove(directory+lockName)
-
-	return api.Success, ""
+	knownResourcesLock.Unlock()
 }
 
 func acquire(client *net.TCPConn, lockName, directory string) (api.LockCommandResult, string) {
@@ -160,27 +126,66 @@ func acquire(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 	return api.Success, "no-op"
 }
 
-func processDisconnect(client *net.TCPConn) {
+func peek(lockName, directory string) (api.LockCommandResult, string, bool) {
 	knownResourcesLock.Lock()
+	defer knownResourcesLock.Unlock()
 
-	var filesToDrop []*os.File
-
-	// perform (inefficient) reverse lookups for deletions
-	for f, by := range resourceAcquiredBy {
-		if by == client {
-			f.Close()
-			filesToDrop = append(filesToDrop, f)
-			delete(resourceAcquiredBy, f)
-		}
+	f, ok := knownResources[lockName]
+	if ok {
+		//TODO: perhaps check that file is really UNLCK?
+		return api.Success, "", true
 	}
-	for _, droppedF := range filesToDrop {
-		for name, f := range knownResources {
-			if f == droppedF {
-				delete(knownResources, name)
-				break
+	var err error
+	// differently from acquire(), file must exist here
+	f, err = os.OpenFile(directory+lockName, os.O_RDWR, 0664)
+	if err != nil {
+		if e, ok := err.(*os.PathError); ok {
+			if e.Err == syscall.ENOENT {
+				return api.Success, "", false
 			}
 		}
+		return api.InternalError, err.Error(), false
 	}
 
-	knownResourcesLock.Unlock()
+	isUnlocked, err := isUnlocked(f)
+	 _= f.Close()
+	if err != nil {
+		return api.InternalError, err.Error(), false
+	}
+
+	return api.Success, "", !isUnlocked
 }
+
+func release(client *net.TCPConn, lockName, directory string) (api.LockCommandResult, string) {
+	knownResourcesLock.Lock()
+	defer knownResourcesLock.Unlock()
+
+	f, ok := knownResources[lockName]
+	if !ok {
+		return api.Failed, "lock not found"
+	}
+	err := releaseLock(f)
+	if err != nil {
+		return api.InternalError, err.Error()
+	}
+
+	// check if lock was acquired by a different client
+	by, ok := resourceAcquiredBy[f]
+	if !ok {
+		panic("BUG: missing resource acquired by record")
+	}
+	if by != client {
+		return api.Failed, "resource acquired in a different session"
+	}
+
+	delete(knownResources, lockName)
+	delete(resourceAcquiredBy, f)
+	_ = f.Close()
+	err = os.Remove(directory+lockName)
+	if err != nil {
+		return api.InternalError, err.Error()
+	}
+
+	return api.Success, ""
+}
+

@@ -47,7 +47,7 @@ func init() {
 	testClientA1 = New(a, time.Second*3, time.Second*2, time.Second*2)
 	testClientA2 = New(a, time.Second*3, time.Second*2, time.Second*2)
 	testClientB1 = New(b, time.Second*3, time.Second*2, time.Second*2)
-	testClientC1 = New(c, time.Second*3, time.Second*2, time.Second*2)
+	testClientC1 = New(c, time.Second*3, time.Second*15, time.Second*15)
 	testClientD1 = New(d, time.Second*3, time.Second*2, time.Second*2)
 }
 
