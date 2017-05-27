@@ -1,4 +1,4 @@
-package dlclient
+package tcp
 
 import (
 	"encoding/gob"

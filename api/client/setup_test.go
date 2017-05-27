@@ -12,13 +12,19 @@ import (
 
 	"bitbucket.org/gdm85/go-distrilock/api/client"
 	"bitbucket.org/gdm85/go-distrilock/api/client/tcp"
+	"bitbucket.org/gdm85/go-distrilock/api/client/ws"
 )
 
 const (
 	defaultServerA = ":63419"
 	defaultServerB = ":63420"
-	defaultServerC = ":63421"
+	defaultServerC = ":63421" // local NFS-share client
 	defaultServerD = "sibling:63422"
+
+	defaultWebsocketServerA = "ws://localhost:63519"
+	defaultWebsocketServerB = "ws://localhost:63520"
+	defaultWebsocketServerC = "ws://localhost:63521"
+	defaultWebsocketServerD = "ws://sibling:63522"
 
 	deterministicTests = true
 )
@@ -90,28 +96,28 @@ func newClientSuite(websockets bool) *clientSuite {
 
 func (cs *clientSuite) createSlowNFSLocalClient() client.Client {
 	if cs.websockets {
-		panic("WRITE ME")
+		return ws.NewBinary(defaultWebsocketServerC, time.Second*3, time.Second*15, time.Second*15)
 	}
-	return createSlowClient(cs.testNFSLocalAddr)
+	return createTCPSlowClient(cs.testNFSLocalAddr)
 }
 
 func (cs *clientSuite) createNFSRemoteClient() client.Client {
 	if cs.websockets {
-		panic("WRITE ME")
+		return ws.NewBinary(defaultWebsocketServerD, time.Second*3, time.Second*2, time.Second*2)
 	}
-	return createClient(cs.testNFSRemoteAddr)
+	return createTCPClient(cs.testNFSRemoteAddr)
 }
 
 func (cs *clientSuite) createLocalClient() client.Client {
 	if cs.websockets {
-		panic("WRITE ME")
+		return ws.NewBinary(defaultWebsocketServerA, time.Second*3, time.Second*2, time.Second*2)
 	}
-	return createClient(cs.testLocalAddr)
+	return createTCPClient(cs.testLocalAddr)
 }
 
 func (cs *clientSuite) createLocalAltClient() client.Client {
 	if cs.websockets {
-		panic("WRITE ME")
+		return ws.NewBinary(defaultWebsocketServerB, time.Second*3, time.Second*2, time.Second*2)
 	}
 	// a second process accessing same locks
 	b, err := net.ResolveTCPAddr("tcp", defaultServerB)
@@ -119,7 +125,7 @@ func (cs *clientSuite) createLocalAltClient() client.Client {
 		panic(err)
 	}
 
-	return createClient(b)
+	return createTCPClient(b)
 }
 
 func (cs *clientSuite) CloseAll() {
@@ -132,20 +138,19 @@ func (cs *clientSuite) CloseAll() {
 	}
 }
 
-func createClient(a *net.TCPAddr) client.Client {
-	return dlclient.New(a, time.Second*3, time.Second*2, time.Second*2)
+func createTCPClient(a *net.TCPAddr) client.Client {
+	return tcp.New(a, time.Second*3, time.Second*2, time.Second*2)
 }
 
-func createSlowClient(a *net.TCPAddr) client.Client {
-	return dlclient.New(a, time.Second*3, time.Second*15, time.Second*15)
+func createTCPSlowClient(a *net.TCPAddr) client.Client {
+	return tcp.New(a, time.Second*3, time.Second*15, time.Second*15)
 }
 
 func TestMain(m *testing.M) {
 	tcpClientSuite = newClientSuite(false)
-	//websocketClientSuite = newClientSuite(true)
+	websocketClientSuite = newClientSuite(true)
 
-	//clientSuites = []*clientSuite{tcpClientSuite, websocketClientSuite}
-	clientSuites = []*clientSuite{tcpClientSuite}
+	clientSuites = []*clientSuite{tcpClientSuite, websocketClientSuite}
 
 	retCode := m.Run()
 
