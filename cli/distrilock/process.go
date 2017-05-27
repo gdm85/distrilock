@@ -35,7 +35,7 @@ func processRequest(directory string, client *net.TCPConn, req api.LockRequest) 
 	case api.Acquire:
 		res.Result, res.Reason = acquire(client, req.LockName, directory)
 	case api.Release:
-		res.Result, res.Reason = release(client, req.LockName)
+		res.Result, res.Reason = release(client, req.LockName, directory)
 	case api.Peek:
 		res.Result, res.Reason, res.IsLocked = peek(req.LockName, directory)
 	default:
@@ -76,7 +76,7 @@ func peek(lockName, directory string) (api.LockCommandResult, string, bool) {
 	return api.Success, "", !isUnlocked
 }
 
-func release(client *net.TCPConn, lockName string) (api.LockCommandResult, string) {
+func release(client *net.TCPConn, lockName, directory string) (api.LockCommandResult, string) {
 	knownResourcesLock.Lock()
 	defer knownResourcesLock.Unlock()
 
@@ -101,6 +101,7 @@ func release(client *net.TCPConn, lockName string) (api.LockCommandResult, strin
 	delete(knownResources, lockName)
 	delete(resourceAcquiredBy, f)
 	_ = f.Close()
+	_ = os.Remove(directory+lockName)
 
 	return api.Success, ""
 }
