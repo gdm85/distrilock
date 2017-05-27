@@ -1,4 +1,10 @@
 #!/bin/bash
+## run-tests.sh
+## @author gdm85
+##
+## Run tests by using different local and remote daemons.
+##
+#
 
 set -e
 
