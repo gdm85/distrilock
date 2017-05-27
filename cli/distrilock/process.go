@@ -80,53 +80,53 @@ func acquire(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 	defer knownResourcesLock.Unlock()
 
 	f, ok := knownResources[lockName]
-	if !ok {
-		var err error
-		f, err = os.OpenFile(directory+lockName+lockExt, os.O_RDWR|os.O_CREATE, 0664)
-		if err != nil {
-			return api.InternalError, err.Error()
+	if ok {
+		// check if lock was acquired by a different client
+		by, ok := resourceAcquiredBy[f]
+		if !ok {
+			panic("BUG: missing resource acquired by record")
+		}
+		if by != client {
+			return api.Failed, "resource acquired through a different session"
 		}
 
-		err = acquireLockDirect(f)
-		if err != nil {
-			f.Close()
+		// already acquired by self
+		//TODO: this is a no-operation, should lock be acquired again with fcntl?
+		//		and what if the re-acquisition fails? that would perhaps qualify
+		//		as a different lock command?
+		return api.Success, "no-op"
+	}
 
-			if e, ok := err.(syscall.Errno); ok {
-				if e == syscall.EAGAIN || e == syscall.EACCES { // to be POSIX-compliant, both errors must be checked
-					return api.Failed, "resource acquired by different process"
-				}
+	var err error
+	f, err = os.OpenFile(directory+lockName+lockExt, os.O_RDWR|os.O_CREATE, 0664)
+	if err != nil {
+		return api.InternalError, err.Error()
+	}
+
+	err = acquireLockDirect(f)
+	if err != nil {
+		f.Close()
+
+		if e, ok := err.(syscall.Errno); ok {
+			if e == syscall.EAGAIN || e == syscall.EACCES { // to be POSIX-compliant, both errors must be checked
+				return api.Failed, "resource acquired by different process"
 			}
-
-			return api.InternalError, err.Error()
 		}
 
-		_, err = f.Write([]byte(fmt.Sprintf("locked by %v", client.RemoteAddr())))
-		if err != nil {
-			f.Close()
-			return api.InternalError, err.Error()
-		}
-
-		resourceAcquiredBy[f] = client
-		knownResources[lockName] = f
-
-		// successful lock acquire
-		return api.Success, ""
+		return api.InternalError, err.Error()
 	}
 
-	// check if lock was acquired by a different client
-	by, ok := resourceAcquiredBy[f]
-	if !ok {
-		panic("BUG: missing resource acquired by record")
-	}
-	if by != client {
-		return api.Failed, "resource acquired through a different session"
+	_, err = f.Write([]byte(fmt.Sprintf("locked by %v", client.RemoteAddr())))
+	if err != nil {
+		f.Close()
+		return api.InternalError, err.Error()
 	}
 
-	// already acquired by self
-	//TODO: this is a no-operation, should lock be acquired again with fcntl?
-	//		and what if the re-acquisition fails? that would perhaps qualify
-	//		as a different lock command?
-	return api.Success, "no-op"
+	resourceAcquiredBy[f] = client
+	knownResources[lockName] = f
+
+	// successful lock acquire
+	return api.Success, ""
 }
 
 func peek(lockName, directory string) (api.LockCommandResult, string, bool) {
