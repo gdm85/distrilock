@@ -14,12 +14,6 @@ type Client interface {
 	Close() error
 }
 
-type ClientImpl interface {
-	AcquireConn() error
-	Do(req *api.LockRequest) (*api.LockResponse, error)
-	Close() error
-}
-
 // Error is the composite error return by all client method calls.
 type Error struct {
 	Result api.LockCommandResult

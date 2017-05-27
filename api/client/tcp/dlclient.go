@@ -8,37 +8,36 @@ import (
 
 	"bitbucket.org/gdm85/go-distrilock/api"
 	"bitbucket.org/gdm85/go-distrilock/api/client"
+	"bitbucket.org/gdm85/go-distrilock/api/client/internal/base"
 )
 
 // Client is a single-connection, non-concurrency-safe client to a distrilock daemon.
 type Client struct {
-	endpoint                             *net.TCPAddr
-	conn *net.TCPConn
-	d    *gob.Decoder
-	e    *gob.Encoder
+	endpoint *net.TCPAddr
+	conn     *net.TCPConn
+	d        *gob.Decoder
+	e        *gob.Encoder
 
 	keepAlive, readTimeout, writeTimeout time.Duration
-	locks map[*client.Lock]struct{}
 }
 
 // String returns a summary of the client connection and active locks.
 func (c *Client) String() string {
-	return fmt.Sprintf("%v with %d locks", c.conn, len(c.locks))
+	return fmt.Sprintf("%v", c.conn)
 }
 
 // New returns a new distrilock client; no connection is performed.
-func New(endpoint *net.TCPAddr, keepAlive, readTimeout, writeTimeout time.Duration) *Client {
-	return &Client{
+func New(endpoint *net.TCPAddr, keepAlive, readTimeout, writeTimeout time.Duration) client.Client {
+	return bclient.New(&Client{
 		endpoint:     endpoint,
 		keepAlive:    keepAlive,
 		readTimeout:  readTimeout,
 		writeTimeout: writeTimeout,
-		locks:        map[*client.Lock]struct{}{},
-	}
+	})
 }
 
 // acquireConn is called every time a connection would be necessary; it does nothing if connection has already been made. It will re-estabilish a connection if Client c had been closed before.
-func (c *Client) acquireConn() error {
+func (c *Client) AcquireConn() error {
 	if c.conn == nil {
 		var err error
 		c.conn, err = net.DialTCP("tcp", nil, c.endpoint)
@@ -62,37 +61,7 @@ func (c *Client) acquireConn() error {
 	return nil
 }
 
-// Acquire will acquire a named lock through the distrilock daemon.
-func (c *Client) Acquire(lockName string) (*client.Lock, error) {
-	err := c.acquireConn()
-	if err != nil {
-		return nil, err
-	}
-
-	var req api.LockRequest
-	req.VersionMajor, req.VersionMinor = api.VersionMajor, api.VersionMinor
-	req.Command = api.Acquire
-	req.LockName = lockName
-
-	res, err := c.do(&req)
-	if err != nil {
-		return nil, err
-	}
-
-	if res.Result == api.Success {
-		// create lock and return it
-		l := &client.Lock{Client: c, Name: lockName}
-
-		c.locks[l] = struct{}{}
-
-		return l, nil
-	}
-
-	return nil, &client.Error{Result: res.Result, Reason: res.Reason}
-}
-
-// do is the function called to process a request on the wire and return the result.
-func (c *Client) do(req *api.LockRequest) (*api.LockResponse, error) {
+func (c *Client) Do(req *api.LockRequest) (*api.LockResponse, error) {
 	if c.writeTimeout != 0 {
 		err := c.conn.SetWriteDeadline(time.Now().Add(c.writeTimeout))
 		if err != nil {
@@ -121,86 +90,6 @@ func (c *Client) do(req *api.LockRequest) (*api.LockResponse, error) {
 	return &res, nil
 }
 
-// Release will release a locked name previously acquired.
-func (c *Client) Release(l *client.Lock) error {
-	if c != l.Client {
-		panic("BUG: attempting to release lock acquired via different client")
-	}
-	err := c.acquireConn()
-	if err != nil {
-		return err
-	}
-
-	var req api.LockRequest
-	req.VersionMajor, req.VersionMinor = api.VersionMajor, api.VersionMinor
-	req.Command = api.Release
-	req.LockName = l.Name
-
-	res, err := c.do(&req)
-	if err != nil {
-		return err
-	}
-
-	if res.Result == api.Success {
-		delete(c.locks, l)
-		return nil
-	}
-
-	return &client.Error{Result: res.Result, Reason: res.Reason}
-}
-
-// IsLocked returns true when distrilock deamon estabilished that lock is currently acquired.
-func (c *Client) IsLocked(lockName string) (bool, error) {
-	err := c.acquireConn()
-	if err != nil {
-		return false, err
-	}
-
-	var req api.LockRequest
-	req.VersionMajor, req.VersionMinor = api.VersionMajor, api.VersionMinor
-	req.Command = api.Peek
-	req.LockName = lockName
-
-	res, err := c.do(&req)
-	if err != nil {
-		return false, err
-	}
-
-	if res.Result == api.Success {
-		return res.IsLocked, nil
-	}
-
-	return false, &client.Error{Result: res.Result, Reason: res.Reason}
-}
-
-
-// Verify will verify that the lock is currently held by the client and healthy.
-func (c *Client) Verify(l *client.Lock) error {
-	if c != l.Client {
-		panic("BUG: attempting to release lock acquired via different client")
-	}
-	err := c.acquireConn()
-	if err != nil {
-		return err
-	}
-
-	var req api.LockRequest
-	req.VersionMajor, req.VersionMinor = api.VersionMajor, api.VersionMinor
-	req.Command = api.Verify
-	req.LockName = l.Name
-
-	res, err := c.do(&req)
-	if err != nil {
-		return err
-	}
-
-	if res.Result == api.Success {
-		return nil
-	}
-
-	return &client.Error{Result: res.Result, Reason: res.Reason}
-}
-
 func (c *Client) Close() error {
 	if c.conn == nil {
 		return nil
@@ -212,6 +101,6 @@ func (c *Client) Close() error {
 	c.conn = nil
 	c.d = nil
 	c.e = nil
-	
+
 	return nil
 }

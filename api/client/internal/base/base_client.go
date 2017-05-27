@@ -7,20 +7,29 @@ import (
 	"bitbucket.org/gdm85/go-distrilock/api/client"
 )
 
+type clientImpl interface {
+	AcquireConn() error
+	// Do is the function called to process a request on the wire and return the result.
+	Do(req *api.LockRequest) (*api.LockResponse, error)
+	// Close will release any associated resource and effectively reset the client object.
+	Close() error
+}
+
 type baseClient struct {
-	client.ClientImpl
-	
+	clientImpl
+
 	locks map[*client.Lock]struct{}
 }
 
 // String returns a summary of the client connection and active locks.
 func (c *baseClient) String() string {
-	return fmt.Sprintf("%v with %d locks", c.ClientImpl, len(c.locks))
+	return fmt.Sprintf("%v with %d locks", c.clientImpl, len(c.locks))
 }
 
-func New(ci client.ClientImpl) client.Client {
+func New(ci clientImpl) client.Client {
 	return &baseClient{
-		ClientImpl: ci,
+		clientImpl: ci,
+		locks:      map[*client.Lock]struct{}{},
 	}
 }
 
@@ -113,7 +122,7 @@ func (c *baseClient) Close() error {
 		l.Release()
 	}
 
-	return c.ClientImpl.Close()
+	return c.clientImpl.Close()
 }
 
 // Verify will verify that the lock is currently held by the client and healthy.

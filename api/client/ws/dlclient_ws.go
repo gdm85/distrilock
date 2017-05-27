@@ -1,25 +1,25 @@
 package dlclientws
 
 import (
+	"encoding/gob"
 	"fmt"
 	"net"
 	"time"
-	"encoding/gob"
 
-	"bitbucket.org/gdm85/go-distrilock/api/client"
 	"bitbucket.org/gdm85/go-distrilock/api"
+	"bitbucket.org/gdm85/go-distrilock/api/client"
 	"bitbucket.org/gdm85/go-distrilock/api/client/internal/base"
-	
+
 	"github.com/gorilla/websocket"
 )
 
 // WebsocketClient is a single-connection, non-concurrency-safe client to a distrilock websocket daemon in binary or JSON mode.
 type WebsocketClient struct {
-	endpoint                             string
-	keepAlive time.Duration
+	endpoint                  string
+	keepAlive                 time.Duration
 	readTimeout, writeTimeout time.Duration
-	conn *websocket.Conn
-	messageType int
+	conn                      *websocket.Conn
+	messageType               int
 }
 
 // String returns a summary of the client connection and active locks.
@@ -31,10 +31,10 @@ func (c *WebsocketClient) String() string {
 func NewBinary(endpoint string, keepAlive, readTimeout, writeTimeout time.Duration) client.Client {
 	return bclient.New(&WebsocketClient{
 		endpoint:     endpoint,
-		readTimeout: readTimeout,
+		readTimeout:  readTimeout,
 		writeTimeout: writeTimeout,
-		keepAlive: keepAlive,
-		messageType : websocket.BinaryMessage,
+		keepAlive:    keepAlive,
+		messageType:  websocket.BinaryMessage,
 	})
 }
 
@@ -42,10 +42,10 @@ func NewBinary(endpoint string, keepAlive, readTimeout, writeTimeout time.Durati
 func NewJSON(endpoint string, keepAlive, readTimeout, writeTimeout time.Duration) client.Client {
 	return bclient.New(&WebsocketClient{
 		endpoint:     endpoint,
-		keepAlive: keepAlive,
-		readTimeout: readTimeout,
+		keepAlive:    keepAlive,
+		readTimeout:  readTimeout,
 		writeTimeout: writeTimeout,
-		messageType : websocket.TextMessage,
+		messageType:  websocket.TextMessage,
 	})
 }
 
@@ -78,7 +78,6 @@ func (c *WebsocketClient) AcquireConn() error {
 	return nil
 }
 
-
 func (c *WebsocketClient) Do(req *api.LockRequest) (*api.LockResponse, error) {
 	if c.writeTimeout != 0 {
 		err := c.conn.SetWriteDeadline(time.Now().Add(c.writeTimeout))
@@ -91,7 +90,7 @@ func (c *WebsocketClient) Do(req *api.LockRequest) (*api.LockResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	e := gob.NewEncoder(w)
 	err = e.Encode(&req)
 	w.Close()
@@ -107,7 +106,7 @@ func (c *WebsocketClient) Do(req *api.LockRequest) (*api.LockResponse, error) {
 			return nil, err
 		}
 	}
-	
+
 	messageType, r, err := c.conn.NextReader()
 	if err != nil {
 		return nil, err
@@ -132,12 +131,12 @@ func (c *WebsocketClient) Close() error {
 	if err != nil {
 		return err
 	}
-	
+
 	err = c.conn.Close()
 	if err != nil {
 		return err
 	}
 	c.conn = nil
-	
+
 	return nil
 }

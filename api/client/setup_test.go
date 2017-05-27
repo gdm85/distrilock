@@ -29,7 +29,7 @@ var (
 )
 
 type clientSuite struct {
-	name string
+	name       string
 	websockets bool
 
 	testClientA1, testClientA2 client.Client
@@ -57,7 +57,7 @@ func newClientSuite(websockets bool) *clientSuite {
 	} else {
 		cs.name = "TCP clients suite"
 	}
-	
+
 	if websockets {
 	} else {
 		// first server process
@@ -113,15 +113,14 @@ func (cs *clientSuite) createLocalAltClient() client.Client {
 	if cs.websockets {
 		panic("WRITE ME")
 	}
-		// a second process accessing same locks
-		b, err := net.ResolveTCPAddr("tcp", defaultServerB)
-		if err != nil {
-			panic(err)
-		}
+	// a second process accessing same locks
+	b, err := net.ResolveTCPAddr("tcp", defaultServerB)
+	if err != nil {
+		panic(err)
+	}
 
 	return createClient(b)
 }
-
 
 func (cs *clientSuite) CloseAll() {
 	// close all clients
