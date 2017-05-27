@@ -79,9 +79,9 @@ type LockRequest struct {
 // LockResponse is a response to a LockRequest; it always embeds the request's command and lock name.
 type LockResponse struct {
 	LockRequest
-	Result   LockCommandResult
+	Result LockCommandResult
 	// Reason is the extra human-readable text provided in case of failure, errors, success.
-	Reason   string
+	Reason string
 	// IsLocked is specified when peeking lock status.
 	IsLocked bool
 }

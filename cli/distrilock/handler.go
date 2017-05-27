@@ -11,16 +11,17 @@ import (
 	"bitbucket.org/gdm85/go-distrilock/api"
 )
 
-// Handles incoming requests.
-func handleRequest(directory string, conn *net.TCPConn) {
+func handleRequests(directory string, conn *net.TCPConn, keepAlivePeriod time.Duration) {
 	// setup keep-alive
 	err := conn.SetKeepAlive(true)
 	if err != nil {
-		panic(err.Error())
+		fmt.Fprintf(os.Stderr, "could not set keep alive: %v\n", err)
+		return
 	}
-	err = conn.SetKeepAlivePeriod(time.Second * 3)
+	err = conn.SetKeepAlivePeriod(keepAlivePeriod)
 	if err != nil {
-		panic(err.Error())
+		fmt.Fprintf(os.Stderr, "could not set keep alive period: %v\n", err)
+		return
 	}
 	//fmt.Println("a client connected")
 
@@ -46,7 +47,6 @@ func handleRequest(directory string, conn *net.TCPConn) {
 
 		res := processRequest(directory, conn, req)
 
-		// Send a response back to person contacting us.
 		err = e.Encode(&res)
 		if err != nil {
 			if err == io.EOF {
@@ -57,7 +57,7 @@ func handleRequest(directory string, conn *net.TCPConn) {
 			continue
 		}
 	}
-	// Close the connection when you're done with it.
+
 	conn.Close()
 	//fmt.Println("a client disconnected")
 

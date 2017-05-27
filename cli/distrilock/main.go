@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"time"
 )
+
+const defaultKeepAlive = time.Second * 3
 
 func main() {
 	flags, err := mustParseFlags(os.Args)
@@ -16,20 +19,20 @@ func main() {
 	// Listen for incoming connections.
 	l, err := net.ListenTCP("tcp", flags.a)
 	if err != nil {
-		fmt.Println("Error listening:", err.Error())
+		fmt.Println("distrilock: error listening:", err.Error())
 		os.Exit(1)
 	}
 	// Close the listener when the application closes.
 	defer l.Close()
-	fmt.Println("Listening on", flags.a)
+	fmt.Println("distrilock: listening on", flags.a)
 	for {
 		// Listen for an incoming connection.
 		conn, err := l.AcceptTCP()
 		if err != nil {
-			fmt.Println("Error accepting: ", err.Error())
-			os.Exit(1)
+			fmt.Fprintln(os.Stderr, "error accepting: ", err.Error())
+			continue
 		}
 		// Handle connections in a new goroutine.
-		go handleRequest(flags.Directory, conn)
+		go handleRequests(flags.Directory, conn, defaultKeepAlive)
 	}
 }
