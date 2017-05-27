@@ -2,16 +2,15 @@ package dlclient
 
 import (
 	"fmt"
-	"math/rand"
 	"testing"
 )
 
 func BenchmarkLocksTaking(b *testing.B) {
-	fixedLockName := fmt.Sprintf("testing-%d", rand.Int())
+	fixedLockName := generateLockName(b)
 	type nameGen func() string
 	benchmarks := []nameGen{
 		func() string {
-			return fmt.Sprintf("testing-%d", rand.Int())
+			return generateLockName(b)
 		},
 		func() string {
 			return fixedLockName

@@ -3,7 +3,6 @@ package dlclient
 import (
 	"fmt"
 	"sync"
-	"math/rand"
 	"testing"
 
 	"bitbucket.org/gdm85/go-distrilock/api"
@@ -13,7 +12,7 @@ func TestAcquireContentionNFS(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode.")
 	}
-	lockName := fmt.Sprintf("testing-%d", rand.Int())
+	lockName := generateLockName(t)
 
 	l1, err := testClientC1.Acquire(lockName)
 	if err != nil {
@@ -60,7 +59,7 @@ func TestAcquireAndReleaseNFS(t *testing.T) {
 		t.Skip("skipping test in short mode.")
 	}
 
-	lockName := fmt.Sprintf("testing-%d", rand.Int())
+	lockName := generateLockName(t)
 
 	l, err := testClientC1.Acquire(lockName)
 	if err != nil {
@@ -81,7 +80,7 @@ func TestAcquireTwiceNFS(t *testing.T) {
 		t.Skip("skipping test in short mode.")
 	}
 
-	lockName := fmt.Sprintf("testing-%d", rand.Int())
+	lockName := generateLockName(t)
 
 	l1, err := testClientC1.Acquire(lockName)
 	if err != nil {
@@ -104,7 +103,7 @@ func TestAcquireAfterReleaseNFS(t *testing.T) {
 		t.Skip("skipping test in short mode.")
 	}
 
-	lockName := fmt.Sprintf("testing-%d", rand.Int())
+	lockName := generateLockName(t)
 
 	l1, err := testClientC1.Acquire(lockName)
 	if err != nil {
@@ -131,13 +130,13 @@ func TestAcquireRaceNFS(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode.")
 	}
-	
-	pfix := fmt.Sprintf("testing-%d", rand.Int())
-	
+
+	pfix := generateLockName(t)
+
 	var wg sync.WaitGroup
-	for i:=0;i<1000;i++ {
+	for i := 0; i < 1000; i++ {
 		lockName := fmt.Sprintf("%s-%d", pfix, i)
-		
+
 		wg.Add(1)
 		go func(lockName string) {
 			defer wg.Done()
@@ -149,6 +148,10 @@ func TestAcquireRaceNFS(t *testing.T) {
 			isLocked, err := testClientD1.IsLocked(lockName)
 			if err != nil || !isLocked {
 				t.Errorf("%s: expected no error and lock acquired, but got err=%v and isLocked=%v", lockName, err, isLocked)
+
+				// release resources
+				l1.Release()
+
 				return
 			}
 			err = l1.Release()
@@ -157,7 +160,6 @@ func TestAcquireRaceNFS(t *testing.T) {
 			}
 		}(lockName)
 	}
-	
+
 	wg.Wait()
 }
-

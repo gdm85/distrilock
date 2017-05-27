@@ -1,20 +1,13 @@
 package dlclient
 
 import (
-	"fmt"
-	"math/rand"
 	"testing"
-	"time"
 
 	"bitbucket.org/gdm85/go-distrilock/api"
 )
 
-func init() {
-	rand.Seed(time.Now().UTC().UnixNano())
-}
-
 func TestAcquireAndRelease(t *testing.T) {
-	lockName := fmt.Sprintf("testing-%d", rand.Int())
+	lockName := generateLockName(t)
 
 	l, err := testClientA1.Acquire(lockName)
 	if err != nil {
@@ -27,7 +20,7 @@ func TestAcquireAndRelease(t *testing.T) {
 }
 
 func TestReleaseNonExisting(t *testing.T) {
-	lockName := fmt.Sprintf("testing-%d", rand.Int())
+	lockName := generateLockName(t)
 
 	l := &Lock{
 		c:    testClientA1,
@@ -41,7 +34,7 @@ func TestReleaseNonExisting(t *testing.T) {
 }
 
 func TestPeekNonExisting(t *testing.T) {
-	lockName := fmt.Sprintf("testing-%d", rand.Int())
+	lockName := generateLockName(t)
 
 	isLocked, err := testClientA1.IsLocked(lockName)
 	if err != nil || isLocked {
@@ -50,7 +43,7 @@ func TestPeekNonExisting(t *testing.T) {
 }
 
 func TestPeekExisting(t *testing.T) {
-	lockName := fmt.Sprintf("testing-%d", rand.Int())
+	lockName := generateLockName(t)
 
 	l, err := testClientA1.Acquire(lockName)
 	if err != nil {
@@ -73,7 +66,7 @@ func TestPeekStale(t *testing.T) {
 }
 
 func TestAcquireTwice(t *testing.T) {
-	lockName := fmt.Sprintf("testing-%d", rand.Int())
+	lockName := generateLockName(t)
 
 	l1, err := testClientA1.Acquire(lockName)
 	if err != nil {
@@ -96,7 +89,7 @@ func TestAcquireTwice(t *testing.T) {
 }
 
 func TestAcquireContention(t *testing.T) {
-	lockName := fmt.Sprintf("testing-%d", rand.Int())
+	lockName := generateLockName(t)
 
 	l1, err := testClientA1.Acquire(lockName)
 	if err != nil {
@@ -139,7 +132,7 @@ func TestAcquireContention(t *testing.T) {
 }
 
 func TestAcquireAndReleaseDiffProc(t *testing.T) {
-	lockName := fmt.Sprintf("testing-%d", rand.Int())
+	lockName := generateLockName(t)
 
 	l, err := testClientA1.Acquire(lockName)
 	if err != nil {
@@ -156,7 +149,7 @@ func TestAcquireAndReleaseDiffProc(t *testing.T) {
 }
 
 func TestAcquireTwiceDiffProc(t *testing.T) {
-	lockName := fmt.Sprintf("testing-%d", rand.Int())
+	lockName := generateLockName(t)
 
 	l1, err := testClientA1.Acquire(lockName)
 	if err != nil {
@@ -175,7 +168,7 @@ func TestAcquireTwiceDiffProc(t *testing.T) {
 }
 
 func TestAcquireAfterDiffProcRelease(t *testing.T) {
-	lockName := fmt.Sprintf("testing-%d", rand.Int())
+	lockName := generateLockName(t)
 
 	l1, err := testClientA1.Acquire(lockName)
 	if err != nil {
@@ -199,7 +192,7 @@ func TestAcquireAfterDiffProcRelease(t *testing.T) {
 }
 
 func TestAcquireContentionDiffProc(t *testing.T) {
-	lockName := fmt.Sprintf("testing-%d", rand.Int())
+	lockName := generateLockName(t)
 
 	l1, err := testClientA1.Acquire(lockName)
 	if err != nil {

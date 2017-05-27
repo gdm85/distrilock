@@ -1,8 +1,11 @@
 package dlclient
 
 import (
+	"fmt"
+	"math/rand"
 	"net"
 	"os"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -22,6 +25,8 @@ var (
 )
 
 func init() {
+	rand.Seed(time.Now().UTC().UnixNano())
+
 	// first server process
 	a, err := net.ResolveTCPAddr("tcp", defaultServerA)
 	if err != nil {
@@ -55,4 +60,20 @@ func TestMain(m *testing.M) {
 	retCode := m.Run()
 
 	os.Exit(retCode)
+}
+
+// generateLockName is an utility function to generate a randomised name of a test.
+func generateLockName(bOrT interface{}) string {
+	var nameV reflect.Value
+	switch v := bOrT.(type) {
+	case *testing.T:
+		nameV = reflect.ValueOf(*v).FieldByName("name")
+	case *testing.B:
+		nameV = reflect.ValueOf(*v).FieldByName("name")
+	default:
+		panic("BUG: passed invalid type to generateLockName")
+	}
+
+	return fmt.Sprintf("%v-%d", nameV, rand.Int())
+
 }

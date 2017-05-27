@@ -46,7 +46,6 @@ func processRequest(directory string, client *net.TCPConn, req api.LockRequest) 
 	return res
 }
 
-
 func processDisconnect(client *net.TCPConn) {
 	knownResourcesLock.Lock()
 
@@ -148,7 +147,7 @@ func peek(lockName, directory string) (api.LockCommandResult, string, bool) {
 	}
 
 	isUnlocked, err := isUnlocked(f)
-	 _= f.Close()
+	_ = f.Close()
 	if err != nil {
 		return api.InternalError, err.Error(), false
 	}
@@ -181,11 +180,10 @@ func release(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 	delete(knownResources, lockName)
 	delete(resourceAcquiredBy, f)
 	_ = f.Close()
-	err = os.Remove(directory+lockName)
+	err = os.Remove(directory + lockName)
 	if err != nil {
 		return api.InternalError, err.Error()
 	}
 
 	return api.Success, ""
 }
-
