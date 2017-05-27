@@ -12,7 +12,7 @@ import (
 )
 
 // Client is a single-connection, non-concurrency-safe client to a distrilock daemon.
-type Client struct {
+type tcpClient struct {
 	endpoint *net.TCPAddr
 	conn     *net.TCPConn
 	d        *gob.Decoder
@@ -22,13 +22,13 @@ type Client struct {
 }
 
 // String returns a summary of the client connection and active locks.
-func (c *Client) String() string {
+func (c *tcpClient) String() string {
 	return fmt.Sprintf("%v", c.conn)
 }
 
 // New returns a new distrilock client; no connection is performed.
 func New(endpoint *net.TCPAddr, keepAlive, readTimeout, writeTimeout time.Duration) client.Client {
-	return bclient.New(&Client{
+	return bclient.New(&tcpClient{
 		endpoint:     endpoint,
 		keepAlive:    keepAlive,
 		readTimeout:  readTimeout,
@@ -37,7 +37,7 @@ func New(endpoint *net.TCPAddr, keepAlive, readTimeout, writeTimeout time.Durati
 }
 
 // acquireConn is called every time a connection would be necessary; it does nothing if connection has already been made. It will re-estabilish a connection if Client c had been closed before.
-func (c *Client) AcquireConn() error {
+func (c *tcpClient) AcquireConn() error {
 	if c.conn == nil {
 		var err error
 		c.conn, err = net.DialTCP("tcp", nil, c.endpoint)
@@ -61,7 +61,7 @@ func (c *Client) AcquireConn() error {
 	return nil
 }
 
-func (c *Client) Do(req *api.LockRequest) (*api.LockResponse, error) {
+func (c *tcpClient) Do(req *api.LockRequest) (*api.LockResponse, error) {
 	if c.writeTimeout != 0 {
 		err := c.conn.SetWriteDeadline(time.Now().Add(c.writeTimeout))
 		if err != nil {
@@ -90,7 +90,7 @@ func (c *Client) Do(req *api.LockRequest) (*api.LockResponse, error) {
 	return &res, nil
 }
 
-func (c *Client) Close() error {
+func (c *tcpClient) Close() error {
 	if c.conn == nil {
 		return nil
 	}
