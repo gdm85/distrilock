@@ -91,7 +91,7 @@ func (c *tcpClient) Do(req *api.LockRequest) (*api.LockResponse, error) {
 	return &res, nil
 }
 
-func (c *tcpClient) Close() error {
+func (c *tcpClient) ReleaseConn() error {
 	if c.conn == nil {
 		return nil
 	}

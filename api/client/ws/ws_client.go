@@ -135,7 +135,7 @@ func (c *websocketClient) Do(req *api.LockRequest) (*api.LockResponse, error) {
 	return &res, nil
 }
 
-func (c *websocketClient) Close() error {
+func (c *websocketClient) ReleaseConn() error {
 	if c.conn == nil {
 		return nil
 	}

@@ -12,8 +12,8 @@ type clientImpl interface {
 	AcquireConn() error
 	// Do is the function called to process a request on the wire and return the result.
 	Do(req *api.LockRequest) (*api.LockResponse, error)
-	// Close will release any associated resource and effectively reset the client object.
-	Close() error
+	// ReleaseConn will release any associated resource and effectively reset the client object.
+	ReleaseConn() error
 }
 
 type baseClient struct {
@@ -123,7 +123,7 @@ func (c *baseClient) Close() error {
 		l.Release()
 	}
 
-	return c.clientImpl.Close()
+	return c.clientImpl.ReleaseConn()
 }
 
 // Verify will verify that the lock is currently held by the client and healthy.
