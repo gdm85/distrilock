@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"bitbucket.org/gdm85/go-distrilock/api/client"
+	"bitbucket.org/gdm85/go-distrilock/api/client/concurrent"
 	"bitbucket.org/gdm85/go-distrilock/api/client/tcp"
 	"bitbucket.org/gdm85/go-distrilock/api/client/ws"
 
@@ -56,7 +57,7 @@ func init() {
 	}
 }
 
-func newClientSuite(clientType int) *clientSuite {
+func newClientSuite(clientType int, concurrencySafe bool) *clientSuite {
 	var cs clientSuite
 	cs.clientType = clientType
 	switch clientType {
@@ -66,6 +67,10 @@ func newClientSuite(clientType int) *clientSuite {
 		cs.name = "Websockets text clients suite"
 	default:
 		cs.name = "TCP clients suite"
+	}
+
+	if concurrencySafe {
+		cs.name += " concurrency-safe"
 	}
 
 	if clientType == 0 {
@@ -93,6 +98,14 @@ func newClientSuite(clientType int) *clientSuite {
 	cs.testClientB1 = cs.createLocalAltClient()
 	cs.testClientC1 = cs.createSlowNFSLocalClient()
 	cs.testClientD1 = cs.createNFSRemoteClient()
+
+	if concurrencySafe {
+		cs.testClientA1 = concurrent.New(cs.testClientA1)
+		cs.testClientA2 = concurrent.New(cs.testClientA2)
+		cs.testClientB1 = concurrent.New(cs.testClientB1)
+		cs.testClientC1 = concurrent.New(cs.testClientC1)
+		cs.testClientD1 = concurrent.New(cs.testClientD1)
+	}
 
 	return &cs
 }
@@ -159,7 +172,10 @@ func (cs *clientSuite) CloseAll() {
 }
 
 func TestMain(m *testing.M) {
-	clientSuites = []*clientSuite{newClientSuite(0), newClientSuite(websocket.BinaryMessage), newClientSuite(websocket.TextMessage)}
+	clientSuites = []*clientSuite{
+		newClientSuite(0, false), newClientSuite(websocket.BinaryMessage, false), newClientSuite(websocket.TextMessage, false),
+		newClientSuite(0, true), newClientSuite(websocket.BinaryMessage, true), newClientSuite(websocket.TextMessage, true),
+	}
 
 	retCode := m.Run()
 
