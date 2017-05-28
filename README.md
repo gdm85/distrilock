@@ -123,6 +123,14 @@ Look at the available tests for usage examples.
 ### Is the client concurrency-safe?
 
 No. One client corresponds to one session which corresponds to one (TCP|Websocket) connection, which is not safe to use across goroutines.
+If you need a concurrency-safe client, use the provided wrapper client in `client/concurrent` as in:
+```go
+	// create a regular client
+	c := tcp.New(addr, time.Second*3, time.Second*3, time.Second*3)
+	
+	// wrap it
+	c = concurrent.New(c)
+```
 
 ### How can I implement something like leases or expiration context?
 
@@ -144,51 +152,22 @@ For an usage that is sensible to network interruptions, something like the follo
 		panic(err)
 	}
 	
-	// initialise a goroutine verifying lock at a specific interval
-	brokenLock := make(chan error)
-	done := make(chan struct{})
-	finished := make(chan struct{})
-	go func() {
-		t := time.NewTicker(time.Millisecond * 400)
-		defer t.Stop()
-		defer func() { finished <- struct{}{} }
-		tickChan := t.C
-		for {
-			select {
-				case <-done:
-					close(brokenLock)
-					return
-				case <-tickChan:
-					err := l.Verify()
-					if err != nil {
-						brokenLock <- err
-						close(brokenLock)
-						return
-					}
-			}
-		}
-     }()
-     
      // start doing some intensive work
-     for !completed {
-		select {
-			case err := <-brokenLock:
-				// lock was broken, operations cannot continue
-				panic(err)
-			default:
-				// nothing to pick from channel, fast exit
-		}
-
+     for {
 		///
 		/// ... do some heavy work here, then iterate for some more heavy work
 		///
+		if completed {
+			break
+		}
+		
+		// verify lock is still in good health
+		err := l.Verify()
+		if err != nil {
+			panic(err)
+		}
      }
      
-	// stop goroutine
-	done <- struct{}{}
-	close(done)
-	<-finished
-	
 	// release lock
 	err = l.Release()
 	if err != nil {
