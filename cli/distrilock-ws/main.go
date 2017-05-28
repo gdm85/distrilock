@@ -23,10 +23,21 @@ func main() {
 		WriteBufferSize: 1024,
 	}
 
-	flags, err := flags.Parse(os.Args, defaultAddress)
+	f, err := flags.Parse(os.Args, defaultAddress)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: %v\n", err)
-		os.Exit(5)
+		os.Exit(1)
+	}
+
+	// print information about maximum number of files
+	noFile, err := flags.GetNumberOfFilesLimit()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: %v\n", err)
+		os.Exit(2)
+	}
+	if noFile <= 1024 {
+		// print maximum number of files only when it's a bit low
+		fmt.Println("distrilock: maximum number of files allowed is", noFile)
 	}
 
 	http.HandleFunc("/distrilock", func(w http.ResponseWriter, r *http.Request) {
@@ -37,13 +48,13 @@ func main() {
 			return
 		}
 
-		handleRequests(flags.Directory, conn, defaultKeepAlive)
+		handleRequests(f.Directory, conn, defaultKeepAlive)
 	})
 
-	fmt.Println("distrilock-ws: listening on", flags.Address)
-	err = http.ListenAndServe(flags.Address, nil)
+	fmt.Println("distrilock-ws: listening on", f.Address)
+	err = http.ListenAndServe(f.Address, nil)
 	if err != nil {
 		fmt.Println("error listening:", err)
-		os.Exit(1)
+		os.Exit(3)
 	}
 }

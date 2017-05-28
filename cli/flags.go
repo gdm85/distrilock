@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"syscall"
 
 	flag "github.com/ogier/pflag"
 )
@@ -50,4 +51,13 @@ func Parse(args []string, defaultAddress string) (*Flags, error) {
 	f.Directory += "/"
 
 	return &f, nil
+}
+
+// GetNumberOfFilesLimit returns the (hard) limit for maximum number of files for the user running current process.
+func GetNumberOfFilesLimit() (uint64, error) {
+	var limit syscall.Rlimit
+	if err := syscall.Getrlimit(syscall.RLIMIT_NOFILE, &limit); err != nil {
+		return 0, err
+	}
+	return limit.Max, nil
 }

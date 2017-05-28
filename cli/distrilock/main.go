@@ -16,24 +16,35 @@ const defaultKeepAlive = time.Second * 3
 const defaultAddress = ":13123"
 
 func main() {
-	flags, err := flags.Parse(os.Args, defaultAddress)
+	f, err := flags.Parse(os.Args, defaultAddress)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: %v\n", err)
-		os.Exit(5)
+		os.Exit(1)
+	}
+
+	// print information about maximum number of files
+	noFile, err := flags.GetNumberOfFilesLimit()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: %v\n", err)
+		os.Exit(2)
+	}
+	if noFile <= 1024 {
+		// print maximum number of files only when it's a bit low
+		fmt.Println("distrilock: maximum number of files allowed is", noFile)
 	}
 
 	// validate address
-	addr, err := net.ResolveTCPAddr("tcp", flags.Address)
+	addr, err := net.ResolveTCPAddr("tcp", f.Address)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: %v\n", err)
-		os.Exit(5)
+		os.Exit(3)
 	}
 
 	// Listen for incoming connections.
 	l, err := net.ListenTCP("tcp", addr)
 	if err != nil {
 		fmt.Println("distrilock: error listening:", err.Error())
-		os.Exit(1)
+		os.Exit(4)
 	}
 	fmt.Println("distrilock: listening on", addr)
 	for {
@@ -44,6 +55,6 @@ func main() {
 			continue
 		}
 		// Handle connections in a new goroutine.
-		go handleRequests(flags.Directory, conn, defaultKeepAlive)
+		go handleRequests(f.Directory, conn, defaultKeepAlive)
 	}
 }
