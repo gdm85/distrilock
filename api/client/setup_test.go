@@ -56,8 +56,9 @@ var (
 )
 
 type clientSuite struct {
-	name       string
-	clientType int
+	name            string
+	clientType      int
+	concurrencySafe bool
 
 	testClientA1, testClientA2 client.Client
 	testClientB1               client.Client
@@ -112,6 +113,7 @@ func TestMain(m *testing.M) {
 
 func newClientSuite(clientType int, concurrencySafe bool) *clientSuite {
 	var cs clientSuite
+	cs.concurrencySafe = concurrencySafe
 	cs.clientType = clientType
 	switch clientType {
 	case websocket.BinaryMessage:

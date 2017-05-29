@@ -17,13 +17,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 import (
 	"testing"
+
+	"bitbucket.org/gdm85/go-distrilock/api/client"
 )
 
 func BenchmarkLocksTaking(b *testing.B) {
 	type lockTakingTest struct {
-		name    string
-		nameGen func() string
-		cs      *clientSuite
+		name      string
+		nameGen   func() string
+		getClient func() client.Client
+		cs        *clientSuite
 	}
 
 	fixedLockName := generateLockName(b)
@@ -32,20 +35,36 @@ func BenchmarkLocksTaking(b *testing.B) {
 
 	// add a couple of benchmarks for each clients suite
 	for _, cs := range clientSuites {
+		var getClient func() client.Client
+		if cs.concurrencySafe {
+			// a fixed client
+			c := cs.createLocalClient()
+
+			getClient = func() client.Client {
+				return c
+			}
+		} else {
+			getClient = func() client.Client {
+				return cs.createLocalClient()
+			}
+		}
+
 		benchmarks = append(benchmarks, []lockTakingTest{
 			{
 				name: cs.name + " random locks",
 				nameGen: func() string {
 					return generateLockName(b)
 				},
-				cs: cs,
+				getClient: getClient,
+				cs:        cs,
 			},
 			{
 				name: cs.name + " fixed locks",
 				nameGen: func() string {
 					return fixedLockName
 				},
-				cs: cs,
+				getClient: getClient,
+				cs:        cs,
 			},
 		}...)
 	}
@@ -55,7 +74,7 @@ func BenchmarkLocksTaking(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				lockName := bm.nameGen()
 
-				c := bm.cs.createLocalClient()
+				c := bm.getClient()
 
 				l, err := c.Acquire(lockName)
 				if err != nil {

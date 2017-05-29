@@ -17,8 +17,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 */
 
 import (
-	"time"
 	"net"
+	"time"
 
 	"bitbucket.org/gdm85/go-distrilock/api/client/tcp"
 )
