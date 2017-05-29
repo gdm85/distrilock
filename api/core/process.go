@@ -61,7 +61,13 @@ func ProcessDisconnect(client *net.TCPConn) {
 	// perform (inefficient) reverse lookups for deletions
 	for f, by := range resourceAcquiredBy {
 		if by == client {
+			// from fcntl(2):
+			// > As well as being removed by an explicit F_UNLCK, record locks are
+			// > automatically released when the process terminates or if it closes any
+			// > file descriptor referring to a file on which locks are held.
+			//NOTE: here it is problematic to ignore the close error, because it could mean that file was not closed and thus lock not released
 			_ = f.Close()
+
 			filesToDrop = append(filesToDrop, f)
 			delete(resourceAcquiredBy, f)
 		}
@@ -162,6 +168,7 @@ func peek(lockName, directory string) (api.LockCommandResult, string, bool) {
 		// same as the no-op in acquire(), it is assumed here that lock is still held by this process
 		return api.Success, "", true
 	}
+
 	var err error
 	// differently from acquire(), file must exist here
 	f, err = os.OpenFile(directory+lockName+lockExt, os.O_RDONLY, 0664)
