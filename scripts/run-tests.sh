@@ -56,4 +56,4 @@ fi
 trap "kill $A $B $C $D $E $F; rm -rf '$TMPD'" EXIT
 
 echo "Running all tests"
-go test $OPTS "$@"
+LOCAL_LOCK_DIR="$TMPD" go test $OPTS "$@"

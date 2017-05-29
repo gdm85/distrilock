@@ -61,6 +61,40 @@ func init() {
 	}
 }
 
+// copied from process.go
+const lockExt = ".lck"
+
+var (
+	shortMode    bool
+	localLockDir string
+)
+
+func TestMain(m *testing.M) {
+	// trick to detect short mode
+	for _, arg := range os.Args[1:] {
+		if arg == "-test.short=true" {
+			shortMode = true
+			break
+		}
+	}
+
+	// local lock directory
+	localLockDir = os.Getenv("LOCAL_LOCK_DIR") + "/"
+
+	clientSuites = []*clientSuite{
+		newClientSuite(0, false), newClientSuite(websocket.BinaryMessage, false), newClientSuite(websocket.TextMessage, false),
+		newClientSuite(0, true), newClientSuite(websocket.BinaryMessage, true), newClientSuite(websocket.TextMessage, true),
+	}
+
+	retCode := m.Run()
+
+	for _, cs := range clientSuites {
+		cs.CloseAll()
+	}
+
+	os.Exit(retCode)
+}
+
 func newClientSuite(clientType int, concurrencySafe bool) *clientSuite {
 	var cs clientSuite
 	cs.clientType = clientType
@@ -181,31 +215,6 @@ func (cs *clientSuite) CloseAll() {
 			_ = c.Close()
 		}
 	}
-}
-
-var shortMode bool
-
-func TestMain(m *testing.M) {
-	// trick to detect short mode
-	for _, arg := range os.Args[1:] {
-		if arg == "-test.short=true" {
-			shortMode = true
-			break
-		}
-	}
-
-	clientSuites = []*clientSuite{
-		newClientSuite(0, false), newClientSuite(websocket.BinaryMessage, false), newClientSuite(websocket.TextMessage, false),
-		newClientSuite(0, true), newClientSuite(websocket.BinaryMessage, true), newClientSuite(websocket.TextMessage, true),
-	}
-
-	retCode := m.Run()
-
-	for _, cs := range clientSuites {
-		cs.CloseAll()
-	}
-
-	os.Exit(retCode)
 }
 
 // generateLockName is an utility function to generate a randomised name of a test.

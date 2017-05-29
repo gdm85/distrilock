@@ -1,6 +1,8 @@
 package client_test
 
 import (
+	"io/ioutil"
+	"os"
 	"testing"
 
 	"bitbucket.org/gdm85/go-distrilock/api"
@@ -56,6 +58,88 @@ func TestAcquireVerifyAndRelease(t *testing.T) {
 	}
 }
 
+func TestAcquireAndReleaseStale(t *testing.T) {
+	for _, cs := range clientSuites {
+		cs := cs
+		t.Run(cs.name, func(t *testing.T) {
+			t.Parallel()
+			lockName := generateLockName(t)
+
+			// simulate a pre-existing stale file
+			err := ioutil.WriteFile(localLockDir+lockName+lockExt, []byte("test"), 0664)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+
+			l, err := cs.testClientA1.Acquire(lockName)
+			if err != nil {
+				t.Error(lockName, err)
+				return
+			}
+			err = l.Release()
+			if err != nil {
+				t.Error(err)
+				return
+			}
+		})
+	}
+}
+
+func TestAcquireInterfere(t *testing.T) {
+	for _, cs := range clientSuites {
+		cs := cs
+		t.Run(cs.name, func(t *testing.T) {
+			t.Parallel()
+
+			lockName := generateLockName(t)
+
+			l, err := cs.testClientA1.Acquire(lockName)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+
+			// here an external action is simulated, e.g. `cat filename.lck`
+			f, err := os.OpenFile(localLockDir+lockName+lockExt, os.O_RDWR, 0664)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			_, err = ioutil.ReadAll(f)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+
+			err = f.Close()
+			if err != nil {
+				t.Error(err)
+				return
+			}
+
+			// try to acquire with a different client
+			_, err = cs.testClientB1.Acquire(lockName)
+			if err == nil || err.Error() != "Failed: resource acquired by different process" {
+				t.Error("expected Failed, got", err)
+				return
+			}
+
+			err = l.Verify()
+			if err != nil {
+				t.Error(err)
+				return
+			}
+
+			err = l.Release()
+			if err != nil {
+				t.Error(err)
+				return
+			}
+		})
+	}
+}
+
 func TestReleaseNonExisting(t *testing.T) {
 	lockName := generateLockName(t)
 
@@ -72,6 +156,29 @@ func TestReleaseNonExisting(t *testing.T) {
 			err := l.Release()
 			if err == nil || err.Error() != "Failed: lock not found" {
 				t.Error("expected lock not found, but got", err)
+			}
+		})
+	}
+}
+
+func TestPeekStaleNonExisting(t *testing.T) {
+
+	for _, cs := range clientSuites {
+		cs := cs
+		t.Run(cs.name, func(t *testing.T) {
+			t.Parallel()
+			lockName := generateLockName(t)
+
+			// simulate a pre-existing stale file
+			err := ioutil.WriteFile(localLockDir+lockName+lockExt, []byte("test"), 0664)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+
+			isLocked, err := cs.testClientA1.IsLocked(lockName)
+			if err != nil || isLocked {
+				t.Error("expected no error and no lock, but got", err, isLocked)
 			}
 		})
 	}

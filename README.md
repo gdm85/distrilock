@@ -33,7 +33,7 @@ $ make
 if ! ls vendor/github.com/ogier/pflag/* 2>/dev/null >/dev/null; then git submodule update --init --recursive; fi
 mkdir -p bin
 GOBIN="/home/gdm85/.../go-distrilock/bin" go install ./cli ./cli/distrilock ./api ./api/client ./api/core ./api/client/tcp ./cli/distrilock-ws ./api/client/ws
-scripts/run-tests.sh ./cli ./cli/distrilock ./api ./api/client ./api/core ./api/client/tcp ./cli/distrilock-ws ./api/client/ws 
+scripts/run-tests.sh ./cli ./cli/distrilock ./api ./api/client ./api/core ./api/client/tcp ./cli/distrilock-ws ./api/client/ws
 Running all tests
 distrilock: listening on :63419
 distrilock: listening on :63420
@@ -128,7 +128,7 @@ If you need a concurrency-safe client, use the provided wrapper client in `clien
 ```go
 	// create a regular client
 	c := tcp.New(addr, time.Second*3, time.Second*3, time.Second*3)
-	
+
 	// wrap it
 	c = concurrent.New(c)
 ```
@@ -146,16 +146,16 @@ For an usage pattern sensible to network interruptions, an implementation like t
 	if err != nil {
 		panic(err)
 	}
-	
+
 	// create client
 	c := tcp.New(addr, time.Second*3, time.Second*3, time.Second*3)
-	
+
 	// acquire lock
 	l, err := c.Acquire("my-named-lock")
 	if err != nil {
 		panic(err)
 	}
-	
+
      // start doing some intensive work
      for {
 		///
@@ -164,20 +164,20 @@ For an usage pattern sensible to network interruptions, an implementation like t
 		if completed {
 			break
 		}
-		
+
 		// verify lock is still in good health
 		err := l.Verify()
 		if err != nil {
 			panic(err)
 		}
      }
-     
+
 	// release lock
 	err = l.Release()
 	if err != nil {
 		panic(err)
 	}
-	
+
 	// close connection
 	err = c.Close()
 	if err != nil {
@@ -188,6 +188,7 @@ For an usage pattern sensible to network interruptions, an implementation like t
 ## Other possible improvements
 
 * the internal map sports a `sync.RWMutex` that optimizes reads; however, read optimizations are only effective if you have a high number of collisions against the same daemon instance; an option to disable RLock could be provided for the rest of scenarios
+* `F_SETLKW` for waiting (and thus queue buildup) could be implemented, although it might need some thread trickery for the use of signals which would not be trivial in Go
 
 ## License
 
