@@ -4,7 +4,7 @@ Distributed locking for pennies.
 distrilock is a TCP and Websockets daemon that leverages Linux [POSIX filesystem locks](http://pubs.opengroup.org/onlinepubs/9699919799/functions/fcntl.html) and is compatible with NFSv4 mountpoints.
 It does not use anything else that a Linux filesystem to enforce locking with `fcntl`; locks persistence is tied 1:1 with connection persistence e.g. **no leases**.
 
-A typical deployment would consist of multiple distrilock daemons using the same directory, optionally shared over NFSv4 for redundancy.
+A typical deployment would consist of one or more distrilock daemons running on different hosts and sharing the same directory as an NFSv4 mountpoint.
 
 ## Terminology and basic functionality
 
@@ -16,10 +16,10 @@ Each session can acquire one more **named locks**; the connection fundamental to
 
 ## How (distributed) locking works
 
-1. the daemon instance tracks multiple named locks per session (= connection), which correspond each to an individual file
-2. client requests lock acquisition through daemon, if viable a fcntl write lock is acquired on the corresponding file and lock is returned as successful
-3. client perform some work within the locked context
-4. client releases lock through daemon, the fcntl write lock is released on the open file which is closed and deleted
+1. the daemon instance tracks multiple named locks per session (= connection), which correspond to an individual file
+2. client requests lock acquisition through daemon, if viable a `fcntl` write lock is acquired on the corresponding file and lock is returned as successful
+3. client performs some work within the locked context
+4. client releases lock through daemon, the `fcntl` write lock is released on the open file which is then closed and deleted
 
 ## NFSv4 specific notes
 
@@ -27,7 +27,7 @@ The default `local_lock=none` must be part of your mountpoint options; [version 
 
 ## Building
 
-After cloning the repository and putting it in an independent GOPATH:
+After cloning the repository and putting it in an independent GOPATH directory structure, run:
 ```bash
 $ make
 if ! ls vendor/github.com/ogier/pflag/* 2>/dev/null >/dev/null; then git submodule update --init --recursive; fi
@@ -122,7 +122,8 @@ Look at the available tests for usage examples.
 
 ### Is the client concurrency-safe?
 
-No. One client corresponds to one session which corresponds to one (TCP|Websocket) connection, which is not safe to use across goroutines.
+No. One TCP/websocket client corresponds to one session, which in turn corresponds to one connection; TCP/websocket connections are not safe to use across goroutines.
+
 If you need a concurrency-safe client, use the provided wrapper client in `client/concurrent` as in:
 ```go
 	// create a regular client
@@ -132,10 +133,13 @@ If you need a concurrency-safe client, use the provided wrapper client in `clien
 	c = concurrent.New(c)
 ```
 
+The concurrency wrapper simply adds a `sync.Mutex` lock/unlock before each `client.Client` method.
+
 ### How can I implement something like leases or expiration context?
 
 Don't. If connection with the daemon is interrupted, you also have to stop assuming that the lock that was being used is still granted to your client.
-For an usage that is sensible to network interruptions, something like the following can be used:
+
+For an usage pattern sensible to network interruptions, an implementation like the following is advised:
 ```go
 	// resolve daemon address
 	addr, err := net.ResolveTCPAddr("tcp", ":13123")
@@ -191,14 +195,15 @@ For an usage that is sensible to network interruptions, something like the follo
 
 ## Relevant links
 
-* [File Locking and Unlocking with Fcntl](http://voyager.deanza.edu/~perry/lock.html), a nice summary on file locking with fcntl, also [available here in markdown format](./c_examples.md)
+* [File Locking and Unlocking with Fcntl](http://voyager.deanza.edu/~perry/lock.html), a nice summary on file locking with `fcntl`, also [available here in markdown format](./c_examples.md)
 * [Linux flock utlity](https://github.com/karelzak/util-linux/blob/master/sys-utils/flock.c)
 * [Advanced Linux Programming: fcntl: Locks and Other File Operations](http://www.informit.com/articles/article.aspx?p=23618&seqNum=4)
 * [How to do distributed locking](https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html), lengthy read, but explains some common pitfalls of distributed locking implementations (and their usage)
 
 ## Similar software
 
-Similar software (not as low level as distrilock though):
+There is a plethora of similar software, usually more sophisticated than distrilock:
+
 * https://github.com/lomik/elock
 * https://github.com/komarov/switchman
 * https://redis.io/topics/distlock
