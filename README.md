@@ -92,9 +92,10 @@ ok  	bitbucket.org/gdm85/go-distrilock/api/client	12.126s
 
 ## Other Makefile targets
 
+* **godoc** runs a local godoc HTTP server to explore package documentation.
+* **godoc-static** will store locally in `docs/` directory the HTML files for godoc package documentation.
 * **codeqa** runs various code quality measurements like `go vet`, `golint` and `errcheck`.
-* **godoc** runs a local godoc HTTP server to explore package documentation
-* **godoc-static** will store locally in `docs/` directory the HTML files for godoc package documentation
+* **simplify** formats and simplifies Go source of this project.
 
 ## How to use
 
@@ -116,7 +117,9 @@ Three types of clients are available:
 * **Websockets** with binary messages, only with `bin/distrilock-ws`
 * **Websockets** with text (JSON) messages, only with `bin/distrilock-ws`
 
-Look at the available tests for usage examples.
+Additionally, these clients can be made concurrency-safe if you plan to re-use a connection for multiple locks if they are wrapped with `concurrent.New`.
+
+A minimal example is available in [example/main.go](./example/main.go).
 
 ## FAQ
 
@@ -135,55 +138,16 @@ If you need a concurrency-safe client, use the provided wrapper client in `clien
 
 The concurrency wrapper simply adds a `sync.Mutex` lock/unlock before each `client.Client` method.
 
+## Shall I use one client for all locks or one client for each lock?
+
+It matters only if you plan to acquire a lot of locks from a single process. The server-side lock acquisition bottleneck will always be there regardless of what type of client you use.
+When creating many clients, keep in mind TCP connections limits and file descriptor limits. An informational message is printed when the daemon process has maximum 1024 or less file descriptors available.
+
 ### How can I implement something like leases or expiration context?
 
 Don't. If connection with the daemon is interrupted, you also have to stop assuming that the lock that was being used is still granted to your client.
 
-For an usage pattern sensible to network interruptions, an implementation like the following is advised:
-```go
-	// resolve daemon address
-	addr, err := net.ResolveTCPAddr("tcp", ":13123")
-	if err != nil {
-		panic(err)
-	}
-
-	// create client
-	c := tcp.New(addr, time.Second*3, time.Second*3, time.Second*3)
-
-	// acquire lock
-	l, err := c.Acquire("my-named-lock")
-	if err != nil {
-		panic(err)
-	}
-
-     // start doing some intensive work
-     for {
-		///
-		/// ... do some heavy work here, then iterate for some more heavy work
-		///
-		if completed {
-			break
-		}
-
-		// verify lock is still in good health
-		err := l.Verify()
-		if err != nil {
-			panic(err)
-		}
-     }
-
-	// release lock
-	err = l.Release()
-	if err != nil {
-		panic(err)
-	}
-
-	// close connection
-	err = c.Close()
-	if err != nil {
-		panic(err)
-	}
-```
+For an usage pattern sensible to network interruptions, see the use of `Verify()` in the provided example [example/main.go](./example/main.go).
 
 ## Other possible improvements
 
@@ -194,6 +158,10 @@ For an usage pattern sensible to network interruptions, an implementation like t
 
 [GNU GPLv2](./LICENSE)
 
+## Credits
+
+Thanks to the people that implemented POSIX locks in Linux and NFSv4; the `man 2 fcntl` page and the online sources that you can find in 'Relevant links' section were helpful in understanding and prototyping.
+
 ## Relevant links
 
 * [File Locking and Unlocking with Fcntl](http://voyager.deanza.edu/~perry/lock.html), a nice summary on file locking with `fcntl`, also [available here in markdown format](./c_examples.md)
@@ -203,8 +171,7 @@ For an usage pattern sensible to network interruptions, an implementation like t
 
 ## Similar software
 
-There is a plethora of similar software, usually more sophisticated than distrilock:
+There is a plethora of similar but more sophisticated software:
 
-* https://github.com/lomik/elock
-* https://github.com/komarov/switchman
-* https://redis.io/topics/distlock
+* https://coreos.com/blog/etcd3-a-new-etcd.html - etcd3 supposedly supports solid distributed locking, according to the release news
+* [The Redlock algorithm](https://redis.io/topics/distlock)
