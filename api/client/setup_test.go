@@ -87,9 +87,11 @@ func newClientSuite(clientType int, concurrencySafe bool) *clientSuite {
 			panic(err)
 		}
 		// second process on NFS, different machine
-		cs.testNFSRemoteAddr, err = net.ResolveTCPAddr("tcp", defaultServerD)
-		if err != nil {
-			panic(err)
+		if !shortMode {
+			cs.testNFSRemoteAddr, err = net.ResolveTCPAddr("tcp", defaultServerD)
+			if err != nil {
+				panic(err)
+			}
 		}
 	}
 
@@ -97,14 +99,18 @@ func newClientSuite(clientType int, concurrencySafe bool) *clientSuite {
 	cs.testClientA2 = cs.createLocalClient()
 	cs.testClientB1 = cs.createLocalAltClient()
 	cs.testClientC1 = cs.createSlowNFSLocalClient()
-	cs.testClientD1 = cs.createNFSRemoteClient()
+	if !shortMode {
+		cs.testClientD1 = cs.createNFSRemoteClient()
+	}
 
 	if concurrencySafe {
 		cs.testClientA1 = concurrent.New(cs.testClientA1)
 		cs.testClientA2 = concurrent.New(cs.testClientA2)
 		cs.testClientB1 = concurrent.New(cs.testClientB1)
 		cs.testClientC1 = concurrent.New(cs.testClientC1)
-		cs.testClientD1 = concurrent.New(cs.testClientD1)
+		if !shortMode {
+			cs.testClientD1 = concurrent.New(cs.testClientD1)
+		}
 	}
 
 	return &cs
@@ -167,11 +173,23 @@ func createTCPSlowClient(a *net.TCPAddr) client.Client {
 func (cs *clientSuite) CloseAll() {
 	// close all clients
 	for _, c := range []client.Client{cs.testClientA1, cs.testClientA2, cs.testClientB1, cs.testClientC1, cs.testClientD1} {
-		_ = c.Close()
+		if c != nil {
+			_ = c.Close()
+		}
 	}
 }
 
+var shortMode bool
+
 func TestMain(m *testing.M) {
+	// trick to detect short mode
+	for _, arg := range os.Args[1:] {
+		if arg == "-test.short=true" {
+			shortMode = true
+			break
+		}
+	}
+
 	clientSuites = []*clientSuite{
 		newClientSuite(0, false), newClientSuite(websocket.BinaryMessage, false), newClientSuite(websocket.TextMessage, false),
 		newClientSuite(0, true), newClientSuite(websocket.BinaryMessage, true), newClientSuite(websocket.TextMessage, true),
