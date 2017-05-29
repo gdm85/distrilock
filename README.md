@@ -73,54 +73,34 @@ $ make benchmark
 
 No timewait TCP recycling nor reuse:
 ```
-BenchmarkLocksTaking/TCP_clients_suite_random_locks-4         	   10000	    692015 ns/op
-BenchmarkLocksTaking/TCP_clients_suite_fixed_locks-4          	   10000	    666181 ns/op
-BenchmarkLocksTaking/Websockets_binary_clients_suite_random_locks-4         	   10000	    758059 ns/op
-BenchmarkLocksTaking/Websockets_binary_clients_suite_fixed_locks-4          	   10000	    714832 ns/op
-BenchmarkLocksTaking/Websockets_text_clients_suite_random_locks-4           	   10000	    752998 ns/op
-BenchmarkLocksTaking/Websockets_text_clients_suite_fixed_locks-4            	   10000	    611460 ns/op
-BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe_random_locks-4      	--- FAIL: BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe_random_locks-4
-	client_bench_test.go:81: dial tcp :63419: connect: cannot assign requested address
---- FAIL: BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe_fixed_locks
-	client_bench_test.go:81: dial tcp :63419: connect: cannot assign requested address
-BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe_random_locks-4         	   10000	   1038098 ns/op
-BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe_fixed_locks-4          	   10000	   1020341 ns/op
-BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe_random_locks-4           	   10000	    664871 ns/op
-BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe_fixed_locks-4            	   10000	    663476 ns/op
---- FAIL: BenchmarkLocksTaking
+BenchmarkLocksTaking/TCP_clients_suite-4         	   10000	    525924 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite-4         	    3000	    706655 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite-4           	    5000	    462627 ns/op
+BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe-4      	    1000	   2443507 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe-4         	    3000	    710488 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe-4           	    5000	    518831 ns/op
+PASS
 ```
 
 With TCP timewait recycling `sysctl -w net.ipv4.tcp_tw_recycle=1`:
 ```
-BenchmarkLocksTaking/TCP_clients_suite_random_locks-4         	   10000	    661990 ns/op
-BenchmarkLocksTaking/TCP_clients_suite_fixed_locks-4          	   10000	    569758 ns/op
-BenchmarkLocksTaking/Websockets_binary_clients_suite_random_locks-4         	   10000	    577048 ns/op
-BenchmarkLocksTaking/Websockets_binary_clients_suite_fixed_locks-4          	   10000	    630397 ns/op
-BenchmarkLocksTaking/Websockets_text_clients_suite_random_locks-4           	   10000	    604710 ns/op
-BenchmarkLocksTaking/Websockets_text_clients_suite_fixed_locks-4            	   10000	    743333 ns/op
-BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe_random_locks-4      	   20000	    390611 ns/op
-BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe_fixed_locks-4       	   20000	    575859 ns/op
-BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe_random_locks-4         	   10000	   1005244 ns/op
-BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe_fixed_locks-4          	    5000	   1116393 ns/op
-BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe_random_locks-4           	   10000	    662228 ns/op
-BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe_fixed_locks-4            	   10000	    754649 ns/op
+BenchmarkLocksTaking/TCP_clients_suite-4         	   10000	    302553 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite-4         	    3000	    689159 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite-4           	    5000	    425821 ns/op
+BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe-4      	   10000	    309075 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe-4         	    3000	    683702 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe-4           	    5000	    433064 ns/op
 PASS
 ```
 
 With TCP timewait reuse `sysctl -w net.ipv4.tcp_tw_reuse=1`:
 ```
-BenchmarkLocksTaking/TCP_clients_suite_random_locks-4         	   10000	    646276 ns/op
-BenchmarkLocksTaking/TCP_clients_suite_fixed_locks-4          	   10000	    604686 ns/op
-BenchmarkLocksTaking/Websockets_binary_clients_suite_random_locks-4         	   10000	    690079 ns/op
-BenchmarkLocksTaking/Websockets_binary_clients_suite_fixed_locks-4          	   10000	    697848 ns/op
-BenchmarkLocksTaking/Websockets_text_clients_suite_random_locks-4           	   10000	    795984 ns/op
-BenchmarkLocksTaking/Websockets_text_clients_suite_fixed_locks-4            	   10000	    672354 ns/op
-BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe_random_locks-4      	   20000	    386510 ns/op
-BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe_fixed_locks-4       	   20000	    405403 ns/op
-BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe_random_locks-4         	   10000	    978992 ns/op
-BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe_fixed_locks-4          	   10000	   1166062 ns/op
-BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe_random_locks-4           	   10000	    695019 ns/op
-BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe_fixed_locks-4            	   10000	    628843 ns/op
+BenchmarkLocksTaking/TCP_clients_suite-4         	   10000	    309728 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite-4         	    3000	    689373 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite-4           	    5000	    439981 ns/op
+BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe-4      	   10000	    307191 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe-4         	    3000	    740121 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe-4           	    5000	    450616 ns/op
 PASS
 ```
 

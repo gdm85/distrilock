@@ -22,59 +22,19 @@ import (
 )
 
 func BenchmarkLocksTaking(b *testing.B) {
-	type lockTakingTest struct {
-		name      string
-		nameGen   func() string
-		getClient func() client.Client
-		cs        *clientSuite
-	}
+	lockName := generateLockName(b)
 
-	fixedLockName := generateLockName(b)
-
-	var benchmarks []lockTakingTest
-
-	// add a couple of benchmarks for each clients suite
-	for _, cs := range clientSuites {
-		var getClient func() client.Client
-		if cs.concurrencySafe {
-			// a fixed client
-			c := cs.createLocalClient()
-
-			getClient = func() client.Client {
-				return c
-			}
-		} else {
-			getClient = func() client.Client {
-				return cs.createLocalClient()
-			}
-		}
-
-		benchmarks = append(benchmarks, []lockTakingTest{
-			{
-				name: cs.name + " random locks",
-				nameGen: func() string {
-					return generateLockName(b)
-				},
-				getClient: getClient,
-				cs:        cs,
-			},
-			{
-				name: cs.name + " fixed locks",
-				nameGen: func() string {
-					return fixedLockName
-				},
-				getClient: getClient,
-				cs:        cs,
-			},
-		}...)
-	}
-
-	for _, bm := range benchmarks {
-		b.Run(bm.name, func(b *testing.B) {
+	for _, cs :=  range clientSuites {
+		fixedClient := cs.createLocalClient()
+		
+		b.Run(cs.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				lockName := bm.nameGen()
-
-				c := bm.getClient()
+				var c client.Client
+				if cs.concurrencySafe {
+					c = fixedClient
+				} else {
+					c = cs.createLocalClient()
+				}
 
 				l, err := c.Acquire(lockName)
 				if err != nil {

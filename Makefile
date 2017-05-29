@@ -22,7 +22,7 @@ test:
 	scripts/run-tests.sh $(PKGS) $(TEST_OPTS)
 
 benchmark:
-	scripts/run-tests.sh -run '^XXX' -bench=. -benchtime=5s $(PKGS)
+	scripts/run-tests.sh -run '^XXX' -bench=. -benchtime=2s $(PKGS)
 
 race:
 	scripts/run-tests.sh -race $(PKGS)
