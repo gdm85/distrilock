@@ -135,7 +135,7 @@ func (c *websocketClient) Do(req *api.LockRequest) (*api.LockResponse, error) {
 	return &res, nil
 }
 
-func (c *websocketClient) ReleaseConn() error {
+func (c *websocketClient) Close() error {
 	if c.conn == nil {
 		return nil
 	}
@@ -143,6 +143,8 @@ func (c *websocketClient) ReleaseConn() error {
 	if err != nil {
 		return err
 	}
+
+	//TODO: wait for ACK?
 
 	err = c.conn.Close()
 	if err != nil {
