@@ -49,7 +49,7 @@ codeqa: vet lint errcheck
 
 vet:
 	@echo -n "**** Running: "
-	go vet $(PKGS) || true
+	mv api/client/setup_test.go api/client/setup_test.go.txt && go vet $(PKGS); RV=$$?; mv api/client/setup_test.go.txt api/client/setup_test.go; exit $$RV
 
 lint:
 	@echo -n "**** Running: "
