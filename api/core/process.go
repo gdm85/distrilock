@@ -17,7 +17,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 */
 
 import (
-	"fmt"
 	"net"
 	"os"
 	"regexp"
@@ -158,13 +157,7 @@ func acquire(client *net.TCPConn, lockName, directory string) (api.LockCommandRe
 		return api.InternalError, err.Error()
 	}
 
-	_, err = f.Write([]byte(fmt.Sprintf("locked by %v", client.RemoteAddr())))
-	if err != nil {
-		_ = f.Close()
-		knownResourcesLock.Unlock()
-
-		return api.InternalError, err.Error()
-	}
+	// writing to file is avoided as it's not necessary
 
 	resourceAcquiredBy[f] = client
 	knownResources[lockName] = f
