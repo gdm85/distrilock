@@ -67,9 +67,6 @@ func (c *baseClient) Acquire(lockName string) (*client.Lock, error) {
 
 // Release will release a locked name previously acquired in this session.
 func (c *baseClient) Release(l *client.Lock) error {
-	/*	if c != l.Client {
-		panic(fmt.Sprintf("BUG: attempting to release lock acquired via different client: %p != %#v", c, l.Client))
-	}*/
 	err := c.AcquireConn()
 	if err != nil {
 		return err
@@ -130,9 +127,6 @@ func (c *baseClient) Close() error {
 
 // Verify will verify that the lock is currently held by the client and healthy.
 func (c *baseClient) Verify(l *client.Lock) error {
-	/*	if c != l.Client {
-		panic("BUG: attempting to verify lock acquired via different client")
-	} */
 	err := c.AcquireConn()
 	if err != nil {
 		return err
