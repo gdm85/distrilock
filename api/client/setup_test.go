@@ -19,9 +19,13 @@ import (
 )
 
 const (
+	// first and default locally running daemon
 	defaultServerA = ":63419"
+	// second locally running daemon
 	defaultServerB = ":63420"
-	defaultServerC = ":63421" // local NFS-share client
+	// locally running daemon on an NFS-shared directory
+	defaultServerC = ":63421"
+	// daemon running on a separate host, sharing same directory via NFS
 	defaultServerD = "sibling:63422"
 
 	defaultWebsocketServerA = "ws://localhost:63519/distrilock"
