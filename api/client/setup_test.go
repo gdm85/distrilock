@@ -184,9 +184,9 @@ func (cs *clientSuite) createSlowNFSLocalClient() client.Client {
 func (cs *clientSuite) createNFSRemoteClient() client.Client {
 	switch cs.clientType {
 	case websocket.BinaryMessage:
-		return ws.NewBinary(defaultWebsocketServerD, time.Second*3, time.Second*2, time.Second*15)
+		return ws.NewBinary(defaultWebsocketServerD, time.Second*3, time.Second*15, time.Second*15)
 	case websocket.TextMessage:
-		return ws.NewJSON(defaultWebsocketServerD, time.Second*3, time.Second*2, time.Second*15)
+		return ws.NewJSON(defaultWebsocketServerD, time.Second*3, time.Second*15, time.Second*15)
 	}
 	return createTCPClient(cs.testNFSRemoteAddr)
 }
