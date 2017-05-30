@@ -17,25 +17,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 import (
 	"testing"
-
-	"bitbucket.org/gdm85/go-distrilock/api/client"
 )
 
 func BenchmarkLocksTaking(b *testing.B) {
 	lockName := generateLockName(b)
 
-	for _, cs :=  range clientSuites {
-		fixedClient := cs.createLocalClient()
+	for _, cs := range clientSuites {
+		c := cs.createLocalClient()
 
 		b.Run(cs.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				var c client.Client
-				// if clients are concurrency-safe, then no need to get a new client for each lock
-				if cs.concurrencySafe {
-					c = fixedClient
-				} else {
-					c = cs.createLocalClient()
-				}
 
 				l, err := c.Acquire(lockName)
 				if err != nil {
@@ -57,5 +48,7 @@ func BenchmarkLocksTaking(b *testing.B) {
 				}
 			}
 		})
+
+		c.Close()
 	}
 }

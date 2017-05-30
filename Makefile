@@ -1,11 +1,11 @@
 ## For usage, see README.md
 
-PKGS := ./cli ./cli/distrilock ./api ./api/client ./api/core ./api/client/tcp ./cli/distrilock-ws ./api/client/ws ./api/client/concurrent ./example
+PKGS := ./cli ./cli/distrilock ./api ./api/client ./api/core ./api/client/tcp ./cli/distrilock-ws ./api/client/ws ./api/client/concurrent ./example ./benchmarks
 PKG := bitbucket.org/gdm85/go-distrilock
 
 all: vendor build test
 
-setup: vendor godoc-tool codeqa-tools
+setup: vendor godoc-tool codeqa-tools benchstat-tool
 	@echo "Setup completed"
 
 vendor:
@@ -23,6 +23,12 @@ test:
 
 benchmark:
 	scripts/run-tests.sh -run '^XXX' -bench=. -benchtime=2s $(PKGS)
+
+benchmark-plot:
+	TIMES=5 scripts/run-tests.sh -run '^XXX' -bench=. -benchtime=1s $(PKGS) > benchstats.txt
+	benchstat benchstats.txt | tail -n+2 | go run benchmarks/conv-data.go > benchstats.dat
+	benchmarks/bench.plot
+	@rm benchstats.txt benchstats.dat
 
 race:
 	scripts/run-tests.sh -race $(PKGS)
@@ -48,6 +54,9 @@ godoc-tool:
 codeqa-tools:
 	go get github.com/golang/lint/golint github.com/kisielk/errcheck
 
+benchstat-tool:
+	go get golang.org/x/perf/cmd/benchstat
+
 codeqa: vet lint errcheck
 
 vet:
@@ -65,4 +74,4 @@ errcheck:
 clean:
 	rm -rf bin/ docs/
 
-.PHONY: all build test clean godoc errcheck codeqa codeqa-tools vet lint godoc-tool godoc-static vendor benchmark race setup docker-image
+.PHONY: all build test clean godoc errcheck codeqa codeqa-tools vet lint godoc-tool godoc-static vendor benchmark race setup docker-image benchstat-tool benchmark-plot

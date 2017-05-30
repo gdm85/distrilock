@@ -55,5 +55,16 @@ fi
 
 trap "kill $A $B $C $D $E $F; rm -rf '$TMPD'" EXIT
 
+if [ -z "$TIMES" ]; then
+	TIMES=1
+fi
+
 echo "Running all tests"
-LOCAL_LOCK_DIR="$TMPD" go test $OPTS "$@"
+set +e
+while [ $TIMES -gt 0 ]; do
+	LOCAL_LOCK_DIR="$TMPD" go test $OPTS "$@" || exit $?
+
+	let TIMES-=1
+done
+
+exit 0

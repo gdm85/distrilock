@@ -1,0 +1,63 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"io"
+	"os"
+	"regexp"
+	"strconv"
+	"strings"
+	"time"
+)
+
+var nonSpaceSeqs = regexp.MustCompile("[^\\s]+")
+
+func main() {
+	reader := bufio.NewReader(os.Stdin)
+
+	rowIndex := 0
+	for {
+		rowIndex++
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			if err == io.EOF {
+				// end of input
+				return
+			}
+			panic(err)
+		}
+
+		// replace +/- character
+		line = strings.Replace(line, "±", "", -1)
+
+		fields := nonSpaceSeqs.FindAllString(line, 3)
+
+		name := strings.Split(fields[0], "/")[1]
+
+		// shorter forms
+		name = strings.Replace(name, "Websockets", "WS", -1)
+		name = strings.Replace(name, "binary_", "", -1)
+		name = strings.Replace(name, "_clients_suite", "", -1)
+		name = strings.Replace(name, "-4", "", -1)
+		name = strings.Replace(name, "_concurrency-safe", "_conc.", -1)
+		name = strings.Replace(name, "_text", "_JSON", -1)
+
+		name = strings.Replace(name, "_", " ", -1)
+
+		value, err := time.ParseDuration(fields[1])
+		if err != nil {
+			panic(err)
+		}
+		pcentS := fields[2]
+		pcent, err := strconv.ParseInt(pcentS[:len(pcentS)-1], 10, 64)
+		if err != nil {
+			panic(err)
+		}
+
+		// convert percentage to flat value
+		pcentNorm := time.Duration(time.Nanosecond * time.Duration(uint(float64(value.Nanoseconds()*pcent)/float64(100))))
+
+		fmt.Println(rowIndex, `"`+name+`"`, value.Seconds()*1000, pcentNorm.Seconds()*1000)
+	}
+}
