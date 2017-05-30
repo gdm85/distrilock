@@ -30,6 +30,9 @@ race:
 simplify:
 	gofmt -w -s $(shell find $(PKGS) -name '*.go' -type f)
 
+docker-image: build
+	scripts/build-docker-image.sh
+
 godoc: godoc-tool
 	@echo "Go documentation available at: http://localhost:8080/pkg/$(PKG)/"
 	godoc -http=:8080
@@ -62,4 +65,4 @@ errcheck:
 clean:
 	rm -rf bin/ docs/
 
-.PHONY: all build test clean godoc errcheck codeqa codeqa-tools vet lint godoc-tool godoc-static vendor benchmark race setup
+.PHONY: all build test clean godoc errcheck codeqa codeqa-tools vet lint godoc-tool godoc-static vendor benchmark race setup docker-image

@@ -28,7 +28,7 @@ import (
 )
 
 const defaultKeepAlive = time.Second * 3
-const defaultAddress = ":13123"
+const defaultAddress = ":40800"
 
 func main() {
 	f, err := flags.Parse(os.Args, defaultAddress)

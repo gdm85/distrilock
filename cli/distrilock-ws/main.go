@@ -30,7 +30,7 @@ import (
 )
 
 const defaultKeepAlive = time.Second * 3
-const defaultAddress = ":13124"
+const defaultAddress = ":40801"
 
 func main() {
 	upgrader := websocket.Upgrader{

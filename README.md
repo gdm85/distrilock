@@ -6,6 +6,8 @@ It does not use anything else that a Linux filesystem to enforce locking with `f
 
 A typical deployment would consist of one or more distrilock daemons running on different hosts and sharing the same directory as an NFSv4 mountpoint.
 
+distrilock runs on TCP port 40800 and distrilock-ws runs on TCP port 40801 (HTTP websockets).
+
 ## Terminology and basic functionality
 
 A **daemon** is a distrilock server-side daemon listening for incoming connections - either TCP or Websockets.
@@ -71,7 +73,7 @@ $ make benchmark
 
 ## Benchmarks
 
-No timewait TCP recycling nor reuse:
+Default (no timewait reuse/recycling):
 ```
 BenchmarkLocksTaking/TCP_clients_suite-4         	   10000	    525924 ns/op
 BenchmarkLocksTaking/Websockets_binary_clients_suite-4         	    3000	    706655 ns/op
@@ -104,12 +106,17 @@ BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe-4           
 PASS
 ```
 
+**NOTE**: these benchmarks run on same host, thus they do not correspond to a realistic scenario where the daemon would be running on a separate host.
+
+See blog post for more accurate benchmarks.
+
 ## Other Makefile targets
 
 * **godoc** runs a local godoc HTTP server to explore package documentation.
 * **godoc-static** will store locally in `docs/` directory the HTML files for godoc package documentation.
 * **codeqa** runs various code quality measurements like `go vet`, `golint` and `errcheck`.
 * **simplify** formats and simplifies Go source of this project.
+* **docker-image** builds a docker image for distrilock and distrilock-ws
 
 ## How to use
 
@@ -131,7 +138,7 @@ Three types of clients are available:
 * **Websockets** with binary messages, only with `bin/distrilock-ws`
 * **Websockets** with text (JSON) messages, only with `bin/distrilock-ws`
 
-Additionally, these clients can be made concurrency-safe if you plan to re-use a connection for multiple locks if they are wrapped with `concurrent.New`.
+Additionally, these clients can be made concurrency-safe by wrapping them with `concurrent.New`; this would allow to save the time of the TCP connection setup and re-use the connection.
 
 A minimal example is available in [example/main.go](./example/main.go).
 
