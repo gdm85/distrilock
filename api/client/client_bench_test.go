@@ -26,10 +26,11 @@ func BenchmarkLocksTaking(b *testing.B) {
 
 	for _, cs :=  range clientSuites {
 		fixedClient := cs.createLocalClient()
-		
+
 		b.Run(cs.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				var c client.Client
+				// if clients are concurrency-safe, then no need to get a new client for each lock
 				if cs.concurrencySafe {
 					c = fixedClient
 				} else {
