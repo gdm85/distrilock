@@ -25,10 +25,9 @@ benchmark:
 	scripts/run-tests.sh -run '^XXX' -bench=. -benchtime=2s $(PKGS)
 
 benchmark-plot:
-	TIMES=5 scripts/run-tests.sh -run '^XXX' -bench=. -benchtime=1s $(PKGS) > benchstats.txt
-	benchstat benchstats.txt | tail -n+2 | go run benchmarks/conv-data.go > benchstats.dat
+	TIMES=5 scripts/run-tests.sh -run '^XXX' -bench=. -benchtime=1s $(PKGS) > benchmarks/benchstats.txt
+	benchstat benchmarks/benchstats.txt | tail -n+2 | go run benchmarks/conv-data.go > benchmarks/benchstats.dat
 	benchmarks/bench.plot
-	@rm benchstats.txt benchstats.dat
 
 race:
 	scripts/run-tests.sh -race $(PKGS)
