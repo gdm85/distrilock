@@ -1,12 +1,14 @@
 # distrilock
 Distributed locking for pennies.
 
-distrilock is a TCP and Websockets daemon that leverages Linux [POSIX filesystem locks](http://pubs.opengroup.org/onlinepubs/9699919799/functions/fcntl.html) and is compatible with NFSv4 mountpoints.
+distrilock is a daemon that leverages Linux [POSIX filesystem locks](http://pubs.opengroup.org/onlinepubs/9699919799/functions/fcntl.html) and is compatible with NFSv4 mountpoints.
 It does not use anything else that a Linux filesystem to enforce locking with `fcntl`; locks persistence is tied 1:1 with connection persistence e.g. **no leases**.
 
 A typical deployment would consist of one or more distrilock daemons running on different hosts and sharing the same directory as an NFSv4 mountpoint.
 
-distrilock runs on TCP port 40800 and distrilock-ws runs on TCP port 40801 (HTTP websockets).
+distrilock daemons run on the following ports depending on type of service:
+* distrilock: port 40800 (TCP)
+* distrilock-ws: port 40801 (HTTP websockets)
 
 ## Terminology and basic functionality
 
@@ -22,6 +24,13 @@ Each session can acquire one more **named locks**; the connection fundamental to
 2. client requests lock acquisition through daemon, if viable a `fcntl` write lock is acquired on the corresponding file and lock is returned as successful
 3. client performs some work within the locked context
 4. client releases lock through daemon, the `fcntl` write lock is released on the open file which is then closed and deleted
+
+## Limitations
+
+The daemon is effectively limited by the maximum number of open file descriptors and TCP connections that can be held; one file descriptor for the lock and one for the TCP connection will be necessary at anytime.
+An informational message is printed when the daemon process has maximum 1024 or less file descriptors available.
+
+The client is affected only by the TCP connections and one file descriptor per TCP connection limitation.
 
 ## NFSv4 specific notes
 
@@ -51,7 +60,9 @@ ok  	bitbucket.org/gdm85/go-distrilock/api/client	0.017s
 ?   	bitbucket.org/gdm85/go-distrilock/api/client/ws	[no test files]
 ```
 
-The binaries `bin/distrilock` (TCP daemon) and `bin/distrilock-ws` (Websockets daemon) will be available.
+The following binaries will be available in `bin/` directory:
+* `distrilock` (TCP daemon)
+* `distrilock-ws` (Websockets daemon)
 
 ## Tests
 
@@ -138,13 +149,13 @@ Three types of clients are available:
 * **Websockets** with binary messages, only with `bin/distrilock-ws`
 * **Websockets** with text (JSON) messages, only with `bin/distrilock-ws`
 
-Additionally, these clients can be made concurrency-safe by wrapping them with `concurrent.New`; this would allow to save the time of the TCP connection setup and re-use the connection.
+If you wish to use a client in a concurrency-safe fashion, wrap it with `concurrent.New`; this would allow to save the time of the TCP connection setup and re-use the connection.
 
 A minimal example is available in [example/main.go](./example/main.go).
 
 ## FAQ
 
-### Is the client concurrency-safe?
+### Is the TCP/Websocket client concurrency-safe?
 
 No. One TCP/websocket client corresponds to one session, which in turn corresponds to one connection; TCP/websocket connections are not safe to use across goroutines.
 
@@ -157,18 +168,22 @@ If you need a concurrency-safe client, use the provided wrapper client in `clien
 	c = concurrent.New(c)
 ```
 
-The concurrency wrapper simply adds a `sync.Mutex` lock/unlock before each `client.Client` method.
+The concurrency wrapper simply adds a `sync.Mutex` lock/unlock before each method of the `client.Client` interface.
 
 ## Shall I use one client for all locks or one client for each lock?
 
 It matters only if you plan to acquire a lot of locks from a single process. The server-side lock acquisition bottleneck will always be there regardless of what type of client you use.
-When creating many clients, keep in mind TCP connections limits and file descriptor limits. An informational message is printed when the daemon process has maximum 1024 or less file descriptors available.
+When creating many clients, keep in mind TCP connections limits and file descriptor limits.
 
 ### How can I implement something like leases or expiration context?
 
 Don't. If connection with the daemon is interrupted, you also have to stop assuming that the lock that was being used is still granted to your client.
 
 For an usage pattern sensible to network interruptions, see the use of `Verify()` in the provided example [example/main.go](./example/main.go).
+
+### What about a gRPC client/server?
+
+[Go gRPC clients](https://github.com/grpc/grpc-go/) have complex retry policies and generally cannot satisfy the persistence requirement.
 
 ## Other possible improvements
 
