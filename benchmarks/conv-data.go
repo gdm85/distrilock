@@ -40,8 +40,8 @@ func main() {
 		name = strings.Replace(name, "binary_", "", -1)
 		name = strings.Replace(name, "_clients_suite", "", -1)
 		name = strings.Replace(name, "-4", "", -1)
-		name = strings.Replace(name, "_concurrency-safe", "_conc.", -1)
-		name = strings.Replace(name, "_text", "_JSON", -1)
+		name = strings.Replace(name, "_concurrency-safe", "\\nconc.", -1)
+		name = strings.Replace(name, "_text", "\\nJSON", -1)
 
 		name = strings.Replace(name, "_", " ", -1)
 
