@@ -24,12 +24,13 @@ test:
 benchmark:
 	scripts/run-tests.sh -run '^XXX' -bench=. -benchtime=2s $(PKGS)
 
+## this is a phony target, and it's always accrued through append '>>'
 benchmarks/benchstats.txt:
-	TIMES=5 scripts/run-tests.sh -run '^XXX' -bench=. -benchtime=1s $(PKGS) > $@
+	TIMES=5 scripts/run-tests.sh -run '^XXX' -bench=. -benchtime=1s $(PKGS) >> $@
 
 benchmark-plot: benchmarks/benchstats.txt
 	benchstat benchmarks/benchstats.txt | tail -n+2 | go run benchmarks/conv-data.go > benchmarks/benchstats.dat
-	benchmarks/bench.plot "" benchmarks/benchstats.dat benchmarks/locks.png
+	benchmarks/bench.plot "$(TITLE)" benchmarks/benchstats.dat benchmarks/locks.svg
 
 race:
 	scripts/run-tests.sh -race $(PKGS)
@@ -75,4 +76,4 @@ errcheck:
 clean:
 	rm -rf bin/ docs/
 
-.PHONY: all build test clean godoc errcheck codeqa codeqa-tools vet lint godoc-tool godoc-static vendor benchmark race setup docker-image benchstat-tool benchmark-plot
+.PHONY: all build test clean godoc errcheck codeqa codeqa-tools vet lint godoc-tool godoc-static vendor benchmark race setup docker-image benchstat-tool benchmark-plot benchmarks/benchstats.txt
