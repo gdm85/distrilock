@@ -24,12 +24,12 @@ test:
 benchmark:
 	scripts/run-tests.sh -run '^XXX' -bench=. -benchtime=2s $(PKGS)
 
-benchmark/benchstats.txt:
-	TIMES=5 scripts/run-tests.sh -run '^XXX' -bench=. -benchtime=1s $(PKGS) > benchmarks/benchstats.txt
+benchmarks/benchstats.txt:
+	TIMES=5 scripts/run-tests.sh -run '^XXX' -bench=. -benchtime=1s $(PKGS) > $@
 
-benchmark-plot: benchmark/benchstats.txt
+benchmark-plot: benchmarks/benchstats.txt
 	benchstat benchmarks/benchstats.txt | tail -n+2 | go run benchmarks/conv-data.go > benchmarks/benchstats.dat
-	benchmarks/bench.plot
+	benchmarks/bench.plot "" benchmarks/benchstats.dat benchmarks/locks.png
 
 race:
 	scripts/run-tests.sh -race $(PKGS)
