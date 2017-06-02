@@ -1,0 +1,285 @@
+Running all tests
+distrilock: listening on :63419
+distrilock-ws: listening on localhost:63520
+distrilock-ws: listening on localhost:63519
+distrilock: listening on :63420
+?   	bitbucket.org/gdm85/go-distrilock/cli	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api	[no test files]
+BenchmarkLocksTaking/TCP_clients_suite-4         	    3000	    430662 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite-4         	    2000	    879459 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite-4           	    3000	    476043 ns/op
+BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe-4      	    5000	    333019 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe-4         	    2000	    810555 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe-4           	    3000	    477830 ns/op
+PASS
+ok  	bitbucket.org/gdm85/go-distrilock/api/client	11.592s
+?   	bitbucket.org/gdm85/go-distrilock/api/core	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/tcp	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock-ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/concurrent	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/example	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/benchmarks	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api	[no test files]
+BenchmarkLocksTaking/TCP_clients_suite-4         	    5000	   1348634 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite-4         	    2000	    790193 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite-4           	    3000	    469906 ns/op
+BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe-4      	     500	   2583371 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe-4         	    2000	    797293 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe-4           	    3000	    471710 ns/op
+PASS
+ok  	bitbucket.org/gdm85/go-distrilock/api/client	14.639s
+?   	bitbucket.org/gdm85/go-distrilock/api/core	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/tcp	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock-ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/concurrent	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/example	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/benchmarks	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api	[no test files]
+BenchmarkLocksTaking/TCP_clients_suite-4         	     500	   2651538 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite-4         	    2000	    786978 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite-4           	    3000	    472623 ns/op
+BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe-4      	     500	   2544605 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe-4         	    2000	    796688 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe-4           	    3000	    489781 ns/op
+PASS
+ok  	bitbucket.org/gdm85/go-distrilock/api/client	9.505s
+?   	bitbucket.org/gdm85/go-distrilock/api/core	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/tcp	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock-ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/concurrent	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/example	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/benchmarks	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api	[no test files]
+BenchmarkLocksTaking/TCP_clients_suite-4         	     500	   2726494 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite-4         	    2000	    764221 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite-4           	    3000	    444616 ns/op
+BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe-4      	     500	   2639283 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe-4         	    2000	    744349 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe-4           	    3000	    460977 ns/op
+PASS
+ok  	bitbucket.org/gdm85/go-distrilock/api/client	9.246s
+?   	bitbucket.org/gdm85/go-distrilock/api/core	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/tcp	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock-ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/concurrent	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/example	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/benchmarks	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api	[no test files]
+BenchmarkLocksTaking/TCP_clients_suite-4         	     500	   3157670 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite-4         	    2000	   1007860 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite-4           	    3000	    666747 ns/op
+BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe-4      	     500	   3109565 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe-4         	    2000	    777331 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe-4           	    3000	    481735 ns/op
+PASS
+ok  	bitbucket.org/gdm85/go-distrilock/api/client	11.014s
+?   	bitbucket.org/gdm85/go-distrilock/api/core	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/tcp	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock-ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/concurrent	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/example	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/benchmarks	[no test files]
+Running all tests
+distrilock: listening on :63419
+distrilock-ws: listening on localhost:63519
+distrilock: listening on :63420
+distrilock-ws: listening on localhost:63520
+?   	bitbucket.org/gdm85/go-distrilock/cli	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api	[no test files]
+BenchmarkLocksTaking/TCP_clients_suite-4         	    5000	    315294 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite-4         	    2000	    697545 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite-4           	    5000	    399334 ns/op
+BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe-4      	    5000	    277634 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe-4         	    2000	    663251 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe-4           	    5000	    400403 ns/op
+PASS
+ok  	bitbucket.org/gdm85/go-distrilock/api/client	10.003s
+?   	bitbucket.org/gdm85/go-distrilock/api/core	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/tcp	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock-ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/concurrent	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/example	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/benchmarks	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api	[no test files]
+BenchmarkLocksTaking/TCP_clients_suite-4         	    5000	    750893 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite-4         	    2000	    687608 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite-4           	    5000	    406049 ns/op
+BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe-4      	    1000	   2279857 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe-4         	    2000	    683656 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe-4           	    5000	    409969 ns/op
+PASS
+ok  	bitbucket.org/gdm85/go-distrilock/api/client	13.362s
+?   	bitbucket.org/gdm85/go-distrilock/api/core	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/tcp	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock-ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/concurrent	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/example	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/benchmarks	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api	[no test files]
+BenchmarkLocksTaking/TCP_clients_suite-4         	    1000	   2317357 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite-4         	    2000	    838323 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite-4           	    3000	    464190 ns/op
+BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe-4      	    1000	   2519813 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe-4         	    2000	    671168 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe-4           	    5000	    472685 ns/op
+PASS
+ok  	bitbucket.org/gdm85/go-distrilock/api/client	12.323s
+?   	bitbucket.org/gdm85/go-distrilock/api/core	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/tcp	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock-ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/concurrent	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/example	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/benchmarks	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api	[no test files]
+BenchmarkLocksTaking/TCP_clients_suite-4         	     500	   2976110 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite-4         	    2000	    763901 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite-4           	    5000	    415166 ns/op
+BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe-4      	    1000	   2362322 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe-4         	    2000	    665889 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe-4           	    5000	    394076 ns/op
+PASS
+ok  	bitbucket.org/gdm85/go-distrilock/api/client	12.402s
+?   	bitbucket.org/gdm85/go-distrilock/api/core	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/tcp	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock-ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/concurrent	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/example	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/benchmarks	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api	[no test files]
+BenchmarkLocksTaking/TCP_clients_suite-4         	     500	   2359436 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite-4         	    2000	    807875 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite-4           	    5000	    424332 ns/op
+BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe-4      	    1000	   2374792 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe-4         	    2000	    690436 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe-4           	    5000	    395522 ns/op
+PASS
+ok  	bitbucket.org/gdm85/go-distrilock/api/client	11.388s
+?   	bitbucket.org/gdm85/go-distrilock/api/core	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/tcp	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock-ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/concurrent	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/example	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/benchmarks	[no test files]
+Running all tests
+distrilock: listening on :63419
+distrilock: listening on :63420
+distrilock-ws: listening on localhost:63519
+distrilock-ws: listening on localhost:63520
+?   	bitbucket.org/gdm85/go-distrilock/cli	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api	[no test files]
+BenchmarkLocksTaking/TCP_clients_suite-4         	    5000	    347899 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite-4         	    2000	    801667 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite-4           	    3000	    478295 ns/op
+BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe-4      	    5000	    365705 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe-4         	    2000	    804573 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe-4           	    3000	    483355 ns/op
+PASS
+ok  	bitbucket.org/gdm85/go-distrilock/api/client	10.039s
+?   	bitbucket.org/gdm85/go-distrilock/api/core	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/tcp	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock-ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/concurrent	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/example	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/benchmarks	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api	[no test files]
+BenchmarkLocksTaking/TCP_clients_suite-4         	    5000	    843510 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite-4         	    2000	    787148 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite-4           	    3000	    480070 ns/op
+BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe-4      	     500	   2424171 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe-4         	    2000	    759115 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe-4           	    3000	    467629 ns/op
+PASS
+ok  	bitbucket.org/gdm85/go-distrilock/api/client	11.925s
+?   	bitbucket.org/gdm85/go-distrilock/api/core	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/tcp	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock-ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/concurrent	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/example	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/benchmarks	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api	[no test files]
+BenchmarkLocksTaking/TCP_clients_suite-4         	     500	   2472906 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite-4         	    2000	    762863 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite-4           	    3000	    475059 ns/op
+BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe-4      	     500	   2429168 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe-4         	    2000	    766873 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe-4           	    3000	    460213 ns/op
+PASS
+ok  	bitbucket.org/gdm85/go-distrilock/api/client	9.120s
+?   	bitbucket.org/gdm85/go-distrilock/api/core	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/tcp	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock-ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/concurrent	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/example	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/benchmarks	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api	[no test files]
+BenchmarkLocksTaking/TCP_clients_suite-4         	     500	   2605995 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite-4         	    2000	    786395 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite-4           	    2000	    565238 ns/op
+BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe-4      	     500	   3017291 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe-4         	    2000	    772376 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe-4           	    3000	    489779 ns/op
+PASS
+ok  	bitbucket.org/gdm85/go-distrilock/api/client	9.411s
+?   	bitbucket.org/gdm85/go-distrilock/api/core	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/tcp	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock-ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/concurrent	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/example	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/benchmarks	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api	[no test files]
+BenchmarkLocksTaking/TCP_clients_suite-4         	     500	   3140389 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite-4         	    2000	    916656 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite-4           	    2000	   1203194 ns/op
+BenchmarkLocksTaking/TCP_clients_suite_concurrency-safe-4      	     500	   2723429 ns/op
+BenchmarkLocksTaking/Websockets_binary_clients_suite_concurrency-safe-4         	    2000	    799244 ns/op
+BenchmarkLocksTaking/Websockets_text_clients_suite_concurrency-safe-4           	    3000	    612135 ns/op
+PASS
+ok  	bitbucket.org/gdm85/go-distrilock/api/client	11.664s
+?   	bitbucket.org/gdm85/go-distrilock/api/core	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/tcp	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock-ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/ws	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/api/client/concurrent	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/example	[no test files]
+?   	bitbucket.org/gdm85/go-distrilock/benchmarks	[no test files]
