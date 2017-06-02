@@ -19,15 +19,18 @@ import (
 	"testing"
 )
 
-func BenchmarkLocksTaking(b *testing.B) {
+func BenchmarkLocks(b *testing.B) {
+	if testing.Short() {
+		b.Skip("skipping test in short mode.")
+	}
+
 	lockName := generateLockName(b)
 
 	for _, cs := range clientSuites {
-		c := cs.createLocalClient()
+		c := cs.createNFSRemoteClient()
 
 		b.Run(cs.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-
 				l, err := c.Acquire(lockName)
 				if err != nil {
 					b.Error(err)
@@ -40,15 +43,13 @@ func BenchmarkLocksTaking(b *testing.B) {
 					c.Close()
 					return
 				}
-
-				err = c.Close()
-				if err != nil {
-					b.Error(err)
-					return
-				}
 			}
 		})
 
-		c.Close()
+		err := c.Close()
+		if err != nil {
+			b.Error(err)
+			return
+		}
 	}
 }
