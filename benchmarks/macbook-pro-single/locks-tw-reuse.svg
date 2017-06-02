@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"  standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg 
+ width="600" height="480"
+ viewBox="0 0 600 480"
+ xmlns="http://www.w3.org/2000/svg"
+ xmlns:xlink="http://www.w3.org/1999/xlink"
+>
+
+<title>Gnuplot</title>
+<desc>Produced by GNUPLOT 5.0 patchlevel 3 </desc>
+
+<g id="gnuplot_canvas">
+
+<rect x="0" y="0" width="600" height="480" fill="none"/>
+<defs>
+
+	<circle id='gpDot' r='0.5' stroke-width='0.5'/>
+	<path id='gpPt0' stroke-width='0.222' stroke='currentColor' d='M-1,0 h2 M0,-1 v2'/>
+	<path id='gpPt1' stroke-width='0.222' stroke='currentColor' d='M-1,-1 L1,1 M1,-1 L-1,1'/>
+	<path id='gpPt2' stroke-width='0.222' stroke='currentColor' d='M-1,0 L1,0 M0,-1 L0,1 M-1,-1 L1,1 M-1,1 L1,-1'/>
+	<rect id='gpPt3' stroke-width='0.222' stroke='currentColor' x='-1' y='-1' width='2' height='2'/>
+	<rect id='gpPt4' stroke-width='0.222' stroke='currentColor' fill='currentColor' x='-1' y='-1' width='2' height='2'/>
+	<circle id='gpPt5' stroke-width='0.222' stroke='currentColor' cx='0' cy='0' r='1'/>
+	<use xlink:href='#gpPt5' id='gpPt6' fill='currentColor' stroke='none'/>
+	<path id='gpPt7' stroke-width='0.222' stroke='currentColor' d='M0,-1.33 L-1.33,0.67 L1.33,0.67 z'/>
+	<use xlink:href='#gpPt7' id='gpPt8' fill='currentColor' stroke='none'/>
+	<use xlink:href='#gpPt7' id='gpPt9' stroke='currentColor' transform='rotate(180)'/>
+	<use xlink:href='#gpPt9' id='gpPt10' fill='currentColor' stroke='none'/>
+	<use xlink:href='#gpPt3' id='gpPt11' stroke='currentColor' transform='rotate(45)'/>
+	<use xlink:href='#gpPt11' id='gpPt12' fill='currentColor' stroke='none'/>
+	<path id='gpPt13' stroke-width='0.222' stroke='currentColor' d='M0,1.330 L1.265,0.411 L0.782,-1.067 L-0.782,-1.076 L-1.265,0.411 z'/>
+	<use xlink:href='#gpPt13' id='gpPt14' fill='currentColor' stroke='none'/>
+	<filter id='textbox' filterUnits='objectBoundingBox' x='0' y='0' height='1' width='1'>
+	  <feFlood flood-color='white' flood-opacity='1' result='bgnd'/>
+	  <feComposite in='SourceGraphic' in2='bgnd' operator='atop'/>
+	</filter>
+	<filter id='greybox' filterUnits='objectBoundingBox' x='0' y='0' height='1' width='1'>
+	  <feFlood flood-color='lightgrey' flood-opacity='1' result='grey'/>
+	  <feComposite in='SourceGraphic' in2='grey' operator='atop'/>
+	</filter>
+</defs>
+<g fill="none" color="white" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M80.2,432.1 L89.2,432.1 M575.0,432.1 L566.0,432.1  '/>	<g transform="translate(71.9,436.6)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Tahoma" > 0.25</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M80.2,385.9 L89.2,385.9 M575.0,385.9 L566.0,385.9  '/>	<g transform="translate(71.9,390.4)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Tahoma" > 0.3</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M80.2,339.8 L89.2,339.8 M575.0,339.8 L566.0,339.8  '/>	<g transform="translate(71.9,344.3)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Tahoma" > 0.35</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M80.2,293.6 L89.2,293.6 M575.0,293.6 L566.0,293.6  '/>	<g transform="translate(71.9,298.1)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Tahoma" > 0.4</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M80.2,247.5 L89.2,247.5 M575.0,247.5 L566.0,247.5  '/>	<g transform="translate(71.9,252.0)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Tahoma" > 0.45</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M80.2,201.3 L89.2,201.3 M575.0,201.3 L566.0,201.3  '/>	<g transform="translate(71.9,205.8)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Tahoma" > 0.5</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M80.2,155.2 L89.2,155.2 M575.0,155.2 L566.0,155.2  '/>	<g transform="translate(71.9,159.7)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Tahoma" > 0.55</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M80.2,109.0 L89.2,109.0 M575.0,109.0 L566.0,109.0  '/>	<g transform="translate(71.9,113.5)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Tahoma" > 0.6</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M80.2,62.9 L89.2,62.9 M575.0,62.9 L566.0,62.9  '/>	<g transform="translate(71.9,67.4)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Tahoma" > 0.65</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M80.2,16.7 L89.2,16.7 M575.0,16.7 L566.0,16.7  '/>	<g transform="translate(71.9,21.2)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Tahoma" > 0.7</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M80.2,432.1 L80.2,423.1 M80.2,16.7 L80.2,25.7  '/>	<g transform="translate(84.7,440.4) rotate(270)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Tahoma" > </tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M150.9,432.1 L150.9,423.1 M150.9,16.7 L150.9,25.7  '/>	<g transform="translate(155.4,440.4) rotate(270)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Tahoma" > </tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M221.6,432.1 L221.6,423.1 M221.6,16.7 L221.6,25.7  '/>	<g transform="translate(226.1,440.4) rotate(270)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Tahoma" > </tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M292.3,432.1 L292.3,423.1 M292.3,16.7 L292.3,25.7  '/>	<g transform="translate(296.8,440.4) rotate(270)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Tahoma" > </tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M362.9,432.1 L362.9,423.1 M362.9,16.7 L362.9,25.7  '/>	<g transform="translate(367.4,440.4) rotate(270)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Tahoma" > </tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M433.6,432.1 L433.6,423.1 M433.6,16.7 L433.6,25.7  '/>	<g transform="translate(438.1,440.4) rotate(270)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Tahoma" > </tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M504.3,432.1 L504.3,423.1 M504.3,16.7 L504.3,25.7  '/>	<g transform="translate(508.8,440.4) rotate(270)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Tahoma" > </tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M575.0,432.1 L575.0,423.1 M575.0,16.7 L575.0,25.7  '/>	<g transform="translate(579.5,440.4) rotate(270)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Tahoma" > </tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M80.2,16.7 L80.2,432.1 L575.0,432.1 L575.0,16.7 L80.2,16.7 Z  '/></g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<g transform="translate(17.6,224.4) rotate(270)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Tahoma" >ms</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<g transform="translate(327.6,471.9)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Tahoma" >client type</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+</g>
+	<g id="gnuplot_plot_1" ><title>With time-wait reuse</title>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<g transform="translate(507.9,39.2)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Tahoma" >With time-wait reuse</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='rgb(148,   0, 211)'  d='M516.2,34.7 L558.4,34.7 M516.2,30.2 L516.2,39.2 M558.4,30.2 L558.4,39.2 M150.9,407.7 L150.9,391.9
+		M146.4,407.7 L155.4,407.7 M146.4,391.9 L155.4,391.9 M221.6,74.6 L221.6,38.2 M217.1,74.6 L226.1,74.6
+		M217.1,38.2 L226.1,38.2 M292.3,298.2 L292.3,290.9 M287.8,298.2 L296.8,298.2 M287.8,290.9 L296.8,290.9
+		M362.9,409.4 L362.9,382.8 M358.4,409.4 L367.4,409.4 M358.4,382.8 L367.4,382.8 M433.6,66.7 L433.6,42.4
+		M429.1,66.7 L438.1,66.7 M429.1,42.4 L438.1,42.4 M504.3,305.5 L504.3,291.0 M499.8,305.5 L508.8,305.5
+		M499.8,291.0 L508.8,291.0  '/>	<use xlink:href='#gpPt0' transform='translate(150.9,399.8) scale(4.50)' color='rgb(148,   0, 211)'/>
+	<use xlink:href='#gpPt0' transform='translate(221.6,56.4) scale(4.50)' color='rgb(148,   0, 211)'/>
+	<use xlink:href='#gpPt0' transform='translate(292.3,294.6) scale(4.50)' color='rgb(148,   0, 211)'/>
+	<use xlink:href='#gpPt0' transform='translate(362.9,396.1) scale(4.50)' color='rgb(148,   0, 211)'/>
+	<use xlink:href='#gpPt0' transform='translate(433.6,54.5) scale(4.50)' color='rgb(148,   0, 211)'/>
+	<use xlink:href='#gpPt0' transform='translate(504.3,298.2) scale(4.50)' color='rgb(148,   0, 211)'/>
+	<use xlink:href='#gpPt0' transform='translate(537.3,34.7) scale(4.50)' color='rgb(148,   0, 211)'/>
+</g>
+	</g>
+	<g id="gnuplot_plot_2" ><title>gnuplot_plot_2</title>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<g transform="translate(167.5,395.3)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Tahoma" >TCP</tspan></text>
+	</g>
+	<g transform="translate(238.2,51.9)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Tahoma" >WS</tspan></text>
+	</g>
+	<g transform="translate(308.9,290.1)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Tahoma" >WS</tspan></text>
+	</g>
+	<g transform="translate(308.9,308.1)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Tahoma" >JSON</tspan></text>
+	</g>
+	<g transform="translate(379.5,391.6)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Tahoma" >TCP</tspan></text>
+	</g>
+	<g transform="translate(379.5,409.6)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Tahoma" >conc.</tspan></text>
+	</g>
+	<g transform="translate(450.2,50.0)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Tahoma" >WS</tspan></text>
+	</g>
+	<g transform="translate(450.2,68.0)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Tahoma" >conc.</tspan></text>
+	</g>
+	<g transform="translate(520.9,293.7)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Tahoma" >WS</tspan></text>
+	</g>
+	<g transform="translate(520.9,311.7)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Tahoma" >JSON</tspan></text>
+	</g>
+	<g transform="translate(520.9,329.7)" stroke="none" fill="black" font-family="Tahoma" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Tahoma" >conc.</tspan></text>
+	</g>
+</g>
+	</g>
+<g fill="none" color="white" stroke="black" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
+</g>
+<g fill="none" color="black" stroke="black" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke='black'  d='M80.2,16.7 L80.2,432.1 L575.0,432.1 L575.0,16.7 L80.2,16.7 Z  '/></g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+</g>
+</g>
+</svg>
+
