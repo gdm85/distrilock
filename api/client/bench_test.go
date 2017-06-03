@@ -34,13 +34,11 @@ func BenchmarkLocks(b *testing.B) {
 				l, err := c.Acquire(lockName)
 				if err != nil {
 					b.Error(err)
-					c.Close()
 					return
 				}
 				err = l.Release()
 				if err != nil {
 					b.Error(err)
-					c.Close()
 					return
 				}
 			}
