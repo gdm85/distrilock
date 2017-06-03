@@ -6,8 +6,8 @@
 ##
 #
 
-if [ ! $# -eq 3 ]; then
-	echo "Usage: remote-tests.sh user server-host client-host" 1>&2
+if [ ! $# -eq 3 -a ! $# -eq 2 ]; then
+	echo "Usage: remote-tests.sh user server-host [client-host]" 1>&2
 	exit 1
 fi
 
@@ -16,21 +16,35 @@ SERVER="$2"
 CLIENT="$3"
 
 set -e
-set -x
+
 ## directory to create remotely
 TMPD=$(mktemp --dry-run /tmp/gds.XXXXXXXX)
 
 ## build binary with benchmark tests
-go test -c -o bin/distrilock-tests -bench=BenchmarkLocks -benchtime=1s ./api/client || exit $?
+go test -c -o bin/distrilock-tests ./api/client || exit $?
 
 ## prepare server
 ssh $USR@$SERVER "mkdir -p /home/$USR/bin && mkdir $TMPD"
+
+if [ ! -z "$CLIENT" ]; then
+	## prepare client
+	ssh $USR@$CLIENT mkdir -p /home/$USR/bin
+	CLIENT_RSYNC="rsync -v bin/distrilock-tests $USR@$CLIENT:/home/$USR/bin/distrilock-tests"
+	echo "Running all remote tests with a remote client"
+	CLIENT_PREFIX="ssh $USR@$CLIENT REMOTE_SERVER=$SERVER"
+else
+	echo "Running all remote tests with a local client"
+	CLIENT_RESYNC=echo
+
+	export REMOTE_SERVER=$SERVER
+fi
+
+## run all rsync in parallel
+coshell << EOF
 rsync -v bin/distrilock $USR@$SERVER:/home/$USR/bin/distrilock
 rsync -v bin/distrilock-ws $USR@$SERVER:/home/$USR/bin/distrilock-ws
-
-## prepare client
-ssh $USR@$CLIENT mkdir -p /home/$USR/bin
-rsync -v bin/distrilock-tests $USR@$CLIENT:/home/$USR/bin/distrilock-tests
+$CLIENT_RSYNC
+EOF
 
 ###
 ### tcp daemon
@@ -38,16 +52,16 @@ rsync -v bin/distrilock-tests $USR@$CLIENT:/home/$USR/bin/distrilock-tests
 SVC=distrilock
 BASE=63419
 
-ssh $USR@$SERVER bin/$SVC --address=:$[BASE+2] --directory="$TMPD" &
+ssh -t -t $USR@$SERVER bin/$SVC --address=:$[BASE+2] --directory="$TMPD" &
 C=$!
 
 ###
-### websocket daemons
+### websocket daemon
 ###
 SVC=distrilock-ws
 BASE=63519
 
-ssh $USR@$SERVER bin/$SVC --address=localhost:$[BASE+2] --directory="$TMPD" &
+ssh -t -t $USR@$SERVER bin/$SVC --address=:$[BASE+2] --directory="$TMPD" &
 F=$!
 
 trap "kill $C $F" EXIT
@@ -56,10 +70,10 @@ if [ -z "$TIMES" ]; then
 	TIMES=1
 fi
 
-echo "Running all remote tests"
 set +e
 while [ $TIMES -gt 0 ]; do
-	ssh $USR@$SERVER bin/distrilock-tests
+	$CLIENT_PREFIX bin/distrilock-tests -test.bench=BenchmarkLocks -test.benchtime=1s -test.run XXX
+
 	let TIMES-=1
 done
 
