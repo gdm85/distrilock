@@ -40,19 +40,22 @@ const (
 	defaultServerB = ":63420"
 	// locally running daemon on an NFS-shared directory
 	defaultServerC = ":63421"
-	// daemon running on a separate host, sharing same directory via NFS
-	defaultServerD = "sibling:63422"
 
 	defaultWebsocketServerA = "ws://localhost:63519/distrilock"
 	defaultWebsocketServerB = "ws://localhost:63520/distrilock"
 	defaultWebsocketServerC = "ws://localhost:63521/distrilock"
-	defaultWebsocketServerD = "ws://sibling:63522/distrilock"
 
 	deterministicTests = true
+	// copied from process.go
+	lockExt = ".lck"
 )
 
 var (
-	clientSuites []*clientSuite
+	clientSuites                            []*clientSuite
+	shortMode                               bool
+	localLockDir                            string
+	remoteServerHost                        string
+	defaultServerD, defaultWebsocketServerD string
 )
 
 type clientSuite struct {
@@ -77,14 +80,6 @@ func init() {
 	}
 }
 
-// copied from process.go
-const lockExt = ".lck"
-
-var (
-	shortMode    bool
-	localLockDir string
-)
-
 func TestMain(m *testing.M) {
 	// trick to detect short mode
 	for _, arg := range os.Args[1:] {
@@ -96,6 +91,14 @@ func TestMain(m *testing.M) {
 
 	// local lock directory
 	localLockDir = os.Getenv("LOCAL_LOCK_DIR") + "/"
+
+	// remote server host
+	remoteServerHost = os.Getenv("REMOTE_SERVER")
+
+	// daemon running on a separate host
+	// used in some coombinations with/without NFS
+	defaultServerD = remoteServerHost + ":63422"
+	defaultWebsocketServerD = fmt.Sprintf("ws://%s:63522/distrilock", remoteServerHost)
 
 	clientSuites = []*clientSuite{
 		newClientSuite(0, false), newClientSuite(websocket.BinaryMessage, false), newClientSuite(websocket.TextMessage, false),
