@@ -8,8 +8,9 @@
 
 if [ ! $# -eq 3 -a ! $# -eq 2 ]; then
 	echo "Usage: remote-tests.sh user server-host [client-host]" 1>&2
-	echo "Optionally, REMOTE_SERVER can be used to provide a local address for the remote server" 1>&2
-	echo "And BENCH_TIME can be used to specify test.benchtime (default 1s)" 1>&2
+	echo "	REMOTE_SERVER can be used to provide a local address for the remote server" 1>&2
+	echo "	BENCH_TIME can be used to specify test.benchtime (default 1s)" 1>&2
+	echo "	BENCH_REGEX can be used to specify test.bench" 1>&2
 	exit 1
 fi
 
@@ -99,7 +100,7 @@ if [ -z "$TIMES" ]; then
 fi
 
 while [ $TIMES -gt 0 ]; do
-	$CLIENT_PREFIX bin/distrilock-tests -test.bench=BenchmarkSuite -test.benchtime=$BENCH_TIME -test.run XXX
+	$CLIENT_PREFIX bin/distrilock-tests -test.bench=$BENCH_REGEX -test.benchtime=$BENCH_TIME -test.run XXX
 
 	let TIMES-=1
 done

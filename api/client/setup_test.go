@@ -52,8 +52,8 @@ const (
 
 var (
 	clientSuites                            []*clientSuite
-	shortMode                               bool
-	localLockDir                            string
+	shortMode                               bool   // from CLI args
+	localLockDir                            string // from environment variable
 	remoteServerHost                        string
 	defaultServerD, defaultWebsocketServerD string
 )
