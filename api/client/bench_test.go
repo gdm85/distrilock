@@ -16,10 +16,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 */
 
 import (
+	"time"
 	"testing"
 )
 
-func BenchmarkAcquireAndRelease(b *testing.B) {
+func BenchmarkSuiteAcquireAndRelease(b *testing.B) {
 	if testing.Short() {
 		b.Skip("skipping test in short mode.")
 	}
@@ -48,6 +49,10 @@ func BenchmarkAcquireAndRelease(b *testing.B) {
 					b.Error(err)
 					return
 				}
+				
+				// do some work
+				time.Sleep(time.Millisecond * 500)
+				
 				err = l.Release()
 				if err != nil {
 					b.Error(err)
