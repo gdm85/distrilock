@@ -29,9 +29,13 @@ func BenchmarkSuiteAcquireAndRelease(b *testing.B) {
 	lockName := generateLockName(b)
 
 	for _, cs := range clientSuites {
+		if cs.concurrencySafe {
+			// not covered by this benchmark
+			continue
+		}
 		c := cs.createNFSRemoteClient()
 
-		// first acquire/release is out of the benchmark as a "warm up"
+		// the very first acquire/release is out of the benchmark as a "warm up" for the underlying connection
 		l, err := c.Acquire(lockName)
 		if err != nil {
 			b.Error(err)

@@ -10,7 +10,7 @@ INPUT="$2"
 OUTPUT="$3"
 
 MIN_Y=0.5
-MAX_Y=1.6
+MAX_Y=1.2
 PLOT_Y="[$MIN_Y:$MAX_Y]"
 #PLOT_Y="[]"
 
