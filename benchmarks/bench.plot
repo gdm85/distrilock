@@ -9,6 +9,11 @@ TITLE="$1"
 INPUT="$2"
 OUTPUT="$3"
 
+MIN_Y=0.5
+MAX_Y=1.6
+PLOT_Y="[$MIN_Y:$MAX_Y]"
+#PLOT_Y="[]"
+
 if [ -z "$TITLE" ]; then
 	TITLE=notitle
 else
@@ -27,6 +32,6 @@ set xtics format " "
 set ylabel "ms"
 set xlabel "client type"
 
-plot [0:7][] '$INPUT' using 1:3:4 with errorbars $TITLE, \
+plot [0:7]$PLOT_Y '$INPUT' using 1:3:4 with errorbars $TITLE, \
 	'' using 1:3:2 with labels offset 2,0.5 notitle;
 EOF

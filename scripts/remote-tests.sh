@@ -26,6 +26,8 @@ if [ -z "$BENCH_TIME" ]; then
 	BENCH_TIME=1s
 fi
 
+TEST_CMD="bin/distrilock-tests -test.bench=$BENCH_REGEX -test.benchtime=$BENCH_TIME -test.run XXX"
+
 set -e
 
 ## directory to create remotely
@@ -42,12 +44,19 @@ if [ ! -z "$CLIENT" ]; then
 	ssh $USR@$CLIENT mkdir -p /home/$USR/bin
 	CLIENT_RSYNC="rsync bin/distrilock-tests $USR@$CLIENT:/home/$USR/bin/distrilock-tests"
 	echo "Running all remote tests with a remote client"
-	CLIENT_PREFIX="ssh $USR@$CLIENT REMOTE_SERVER=$REMOTE_SERVER"
+
+	function client_start() {
+		ssh -t -t $USR@$CLIENT "ulimit -n 64000 && REMOTE_SERVER=$REMOTE_SERVER exec $TEST_CMD"
+	}
 else
 	echo "Running all remote tests with a local client"
-	CLIENT_RESYNC=echo
+	CLIENT_RSYNC=echo
 
 	export REMOTE_SERVER=$REMOTE_SERVER
+
+	function client_start() {
+		$TEST_CMD
+	}
 fi
 
 ## run all rsync in parallel
@@ -63,7 +72,7 @@ EOF
 SVC=distrilock
 PORT=63422
 
-ssh -t -t $USR@$SERVER "bin/$SVC --address=:$PORT --directory=$TMPD" &
+ssh -t -t $USR@$SERVER "ulimit -n 64000 && exec bin/$SVC --address=:$PORT --directory=$TMPD" &
 C=$!
 
 ###
@@ -72,7 +81,7 @@ C=$!
 SVC=distrilock-ws
 WSPORT=63522
 
-ssh -t -t $USR@$SERVER "bin/$SVC --address=:$WSPORT --directory=$TMPD" &
+ssh -t -t $USR@$SERVER "ulimit -n 64000 && exec bin/$SVC --address=:$WSPORT --directory=$TMPD" &
 F=$!
 
 trap "kill $C $F" EXIT
@@ -100,7 +109,7 @@ if [ -z "$TIMES" ]; then
 fi
 
 while [ $TIMES -gt 0 ]; do
-	$CLIENT_PREFIX bin/distrilock-tests -test.bench=$BENCH_REGEX -test.benchtime=$BENCH_TIME -test.run XXX
+	client_start
 
 	let TIMES-=1
 done
