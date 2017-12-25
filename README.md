@@ -10,6 +10,8 @@ distrilock daemons run on the following ports depending on type of service:
 * distrilock: port 40800 (TCP)
 * distrilock-ws: port 40801 (HTTP websockets)
 
+Release post on medium: https://medium.com/@gdm85/distributed-locking-for-pennies-distrilock-967347e7f2dd
+
 ## Terminology and basic functionality
 
 A **daemon** is a distrilock server-side daemon listening for incoming connections - either TCP or Websockets.
@@ -118,8 +120,6 @@ PASS
 ```
 
 **NOTE**: these benchmarks run on same host, thus they do not correspond to a realistic scenario where the daemon would be running on a separate host.
-
-See blog post for more accurate benchmarks.
 
 ## Other Makefile targets
 
