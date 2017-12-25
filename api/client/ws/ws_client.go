@@ -23,9 +23,9 @@ import (
 	"net"
 	"time"
 
-	"bitbucket.org/gdm85/go-distrilock/api"
-	"bitbucket.org/gdm85/go-distrilock/api/client"
-	"bitbucket.org/gdm85/go-distrilock/api/client/internal/base"
+	"github.com/gdm85/distrilock/api"
+	"github.com/gdm85/distrilock/api/client"
+	"github.com/gdm85/distrilock/api/client/internal/base"
 
 	"github.com/gorilla/websocket"
 )

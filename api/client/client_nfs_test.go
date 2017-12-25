@@ -20,8 +20,8 @@ import (
 	"sync"
 	"testing"
 
-	"bitbucket.org/gdm85/go-distrilock/api"
-	"bitbucket.org/gdm85/go-distrilock/api/client"
+	"github.com/gdm85/distrilock/api"
+	"github.com/gdm85/distrilock/api/client"
 )
 
 func TestAcquireContentionNFS(t *testing.T) {

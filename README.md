@@ -50,14 +50,14 @@ distrilock: listening on :63419
 distrilock: listening on :63420
 distrilock-ws: listening on localhost:63519
 distrilock-ws: listening on localhost:63520
-?   	bitbucket.org/gdm85/go-distrilock/cli	[no test files]
-?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock	[no test files]
-?   	bitbucket.org/gdm85/go-distrilock/api	[no test files]
-ok  	bitbucket.org/gdm85/go-distrilock/api/client	0.017s
-?   	bitbucket.org/gdm85/go-distrilock/api/core	[no test files]
-?   	bitbucket.org/gdm85/go-distrilock/api/client/tcp	[no test files]
-?   	bitbucket.org/gdm85/go-distrilock/cli/distrilock-ws	[no test files]
-?   	bitbucket.org/gdm85/go-distrilock/api/client/ws	[no test files]
+?   	github.com/gdm85/distrilock/cli	[no test files]
+?   	github.com/gdm85/distrilock/cli/distrilock	[no test files]
+?   	github.com/gdm85/distrilock/api	[no test files]
+ok  	github.com/gdm85/distrilock/api/client	0.017s
+?   	github.com/gdm85/distrilock/api/core	[no test files]
+?   	github.com/gdm85/distrilock/api/client/tcp	[no test files]
+?   	github.com/gdm85/distrilock/cli/distrilock-ws	[no test files]
+?   	github.com/gdm85/distrilock/api/client/ws	[no test files]
 ```
 
 The following binaries will be available in `bin/` directory:

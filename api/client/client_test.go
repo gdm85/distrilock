@@ -20,8 +20,8 @@ import (
 	"os"
 	"testing"
 
-	"bitbucket.org/gdm85/go-distrilock/api"
-	"bitbucket.org/gdm85/go-distrilock/api/client"
+	"github.com/gdm85/distrilock/api"
+	"github.com/gdm85/distrilock/api/client"
 )
 
 func TestAcquireAndRelease(t *testing.T) {

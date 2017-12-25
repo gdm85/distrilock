@@ -19,7 +19,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 import (
 	"fmt"
 
-	"bitbucket.org/gdm85/go-distrilock/api"
+	"github.com/gdm85/distrilock/api"
 )
 
 // Client is a generic distrilock client interface.

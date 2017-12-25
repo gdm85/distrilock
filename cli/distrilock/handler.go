@@ -23,8 +23,8 @@ import (
 	"os"
 	"time"
 
-	"bitbucket.org/gdm85/go-distrilock/api"
-	"bitbucket.org/gdm85/go-distrilock/api/core"
+	"github.com/gdm85/distrilock/api"
+	"github.com/gdm85/distrilock/api/core"
 )
 
 func handleRequests(directory string, conn *net.TCPConn, keepAlivePeriod time.Duration) {

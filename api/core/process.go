@@ -23,7 +23,7 @@ import (
 	"sync"
 	"syscall"
 
-	"bitbucket.org/gdm85/go-distrilock/api"
+	"github.com/gdm85/distrilock/api"
 )
 
 const lockExt = ".lck"

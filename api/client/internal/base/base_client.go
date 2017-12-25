@@ -17,8 +17,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 */
 
 import (
-	"bitbucket.org/gdm85/go-distrilock/api"
-	"bitbucket.org/gdm85/go-distrilock/api/client"
+	"github.com/gdm85/distrilock/api"
+	"github.com/gdm85/distrilock/api/client"
 )
 
 type clientImpl interface {

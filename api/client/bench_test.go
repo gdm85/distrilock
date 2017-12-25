@@ -18,7 +18,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 import (
 	"testing"
 
-	"bitbucket.org/gdm85/go-distrilock/api/client"
+	"github.com/gdm85/distrilock/api/client"
 )
 
 func BenchmarkSuiteAcquireAndRelease(b *testing.B) {

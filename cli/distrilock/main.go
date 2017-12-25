@@ -24,7 +24,7 @@ import (
 	"os"
 	"time"
 
-	"bitbucket.org/gdm85/go-distrilock/cli"
+	"github.com/gdm85/distrilock/cli"
 )
 
 const defaultKeepAlive = time.Second * 3

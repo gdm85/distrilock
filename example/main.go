@@ -20,7 +20,7 @@ import (
 	"net"
 	"time"
 
-	"bitbucket.org/gdm85/go-distrilock/api/client/tcp"
+	"github.com/gdm85/distrilock/api/client/tcp"
 )
 
 func main() {

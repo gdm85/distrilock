@@ -1,7 +1,7 @@
 ## For usage, see README.md
 
 PKGS := ./cli ./cli/distrilock ./api ./api/client ./api/core ./api/client/tcp ./cli/distrilock-ws ./api/client/ws ./api/client/concurrent ./example ./benchmarks
-PKG := bitbucket.org/gdm85/go-distrilock
+PKG := github.org/gdm85/distrilock
 
 all: vendor build test
 

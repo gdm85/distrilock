@@ -25,10 +25,10 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/gdm85/go-distrilock/api/client"
-	"bitbucket.org/gdm85/go-distrilock/api/client/concurrent"
-	"bitbucket.org/gdm85/go-distrilock/api/client/tcp"
-	"bitbucket.org/gdm85/go-distrilock/api/client/ws"
+	"github.com/gdm85/distrilock/api/client"
+	"github.com/gdm85/distrilock/api/client/concurrent"
+	"github.com/gdm85/distrilock/api/client/tcp"
+	"github.com/gdm85/distrilock/api/client/ws"
 
 	"github.com/gorilla/websocket"
 )
